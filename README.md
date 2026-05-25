@@ -8,20 +8,23 @@ package main
 import "github.com/CzaxStudio/proton"
 
 type UI struct {
-    name proton.Editor
-    btn  proton.Clickable
+	name proton.Editor
+	btn  proton.Clickable
 }
 
 func main() {
-    u := &UI{}
-    a := proton.New("my app")
-    a.Window("Hello", 480, 300, func(win *proton.Win) {
-        proton.Input(win, &u.name, "Your name")
-        if proton.Button(win, &u.btn, "Go") {
-            println("Hello,", u.name.Text())
-        }
-    })
-    a.Run()
+
+	u := &UI{}
+	a := proton.New("my app")
+	a.Window("Hello", 480, 300, func(win *proton.Win) {
+		proton.Input(win, &u.name, "Your name")
+		proton.RowEnd(win, func(win *proton.Win) {
+			if proton.Button(win, &u.btn, "Go") {
+				println("Hello,", u.name.Text())
+			}
+		})
+	})
+	a.Run()
 }
 ```
 
@@ -101,6 +104,14 @@ proton.Gap(win, 12)
 // split panes
 proton.Split(win, 0.3, leftFn, rightFn)
 proton.HSplit(win, 0.4, topFn, bottomFn)
+
+// grid
+proton.Grid(win, 3, 8,
+    func(win *proton.Win) { proton.Label(win, "one") },
+    func(win *proton.Win) { proton.Label(win, "two") },
+    func(win *proton.Win) { proton.Label(win, "three") },
+    func(win *proton.Win) { proton.Label(win, "four") },
+)
 ```
 
 ## Widgets
@@ -129,6 +140,7 @@ proton.HSplit(win, 0.4, topFn, bottomFn)
 | `RoundRect(win, color, w, h, r)` | rounded rectangle |
 | `Card(win, bg, corner, pad, fn)` | content in a card background |
 | `Badge(win, bg, fg, text)` | small colored chip |
+| `Toast(win, &state)` | overlay notification at bottom |
 
 ## Theming
 
