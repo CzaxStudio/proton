@@ -1,6 +1,6 @@
 # Proton
 
-A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
+An ultra easy GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
 ## To be published on June 12th 2026.
 
