@@ -1,8 +1,6 @@
 # Proton
 
-An ultra easy GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
-
-## To be published on June 12th 2026.
+A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
 ```go
 package main
@@ -10,23 +8,23 @@ package main
 import "github.com/CzaxStudio/proton"
 
 type UI struct {
-	name proton.Editor
-	btn  proton.Clickable
+    name proton.Editor
+    btn  proton.Clickable
 }
 
 func main() {
-
-	u := &UI{}
-	a := proton.New("my app")
-	a.Window("Hello", 480, 300, func(win *proton.Win) {
-		proton.Input(win, &u.name, "Your name")
-		proton.RowEnd(win, func(win *proton.Win) {
-			if proton.Button(win, &u.btn, "Go") {
-				println("Hello,", u.name.Text())
-			}
-		})
-	})
-	a.Run()
+    u := &UI{}
+    a := proton.New("my app")
+    a.Window("Hello", 480, 300, func(win *proton.Win) {
+        proton.H3(win, "Hello from Proton!")
+        proton.Gap(win, 8)
+        proton.Input(win, &u.name, "Your name")
+        proton.Gap(win, 8)
+        if proton.Button(win, &u.btn, "Go") {
+            println("Hello,", u.name.Text())
+        }
+    })
+    a.Run()
 }
 ```
 
@@ -36,7 +34,7 @@ func main() {
 go get github.com/CzaxStudio/proton
 ```
 
-Linux needs Gio's system packages:
+Linux system deps:
 ```
 apt install libwayland-dev libxkbcommon-dev libvulkan-dev
 ```
@@ -45,115 +43,115 @@ macOS and Windows need nothing extra.
 
 ## How it works
 
-Gio is immediate mode — your draw function runs every frame and you just call
-widget functions in order. State lives in your own structs; Proton re-exports
-the state types so you only need one import.
+Gio is immediate mode — your draw function runs every frame. Widgets called
+directly in your draw function stack vertically by default. Use `Row()` or
+`Column()` for other arrangements.
 
-The `*Win` passed to your draw function carries the current layout context.
-When you use layout helpers like `Column` or `Pad`, they scope it for each
-child automatically.
-
-```go
-type State struct {
-    count int
-    btn   proton.Clickable
-}
-
-s := &State{}
-a.Window("Counter", 300, 200, func(win *proton.Win) {
-    proton.H4(win, fmt.Sprintf("Count: %d", s.count))
-    proton.Gap(win, 8)
-    if proton.Button(win, &s.btn, "Increment") {
-        s.count++
-    }
-})
-```
+State (button clicks, text, checkboxes) lives in your own structs using
+Proton's re-exported types so you only need one import.
 
 ## Layouts
 
-```go
-// vertical stack
-proton.Column(win,
-    func(win *proton.Win) { proton.Label(win, "first") },
-    func(win *proton.Win) { proton.Label(win, "second") },
-)
-
-// horizontal row
-proton.Row(win,
-    func(win *proton.Win) { proton.Label(win, "left") },
-    func(win *proton.Win) { proton.Label(win, "right") },
-)
-
-// one child stretches, others are fixed
-proton.GrowRow(win,
-    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "label") }),
-    proton.GrowItem(win, func(win *proton.Win) { proton.Input(win, &e, "") }),
-    proton.FixedItem(win, func(win *proton.Win) { proton.Button(win, &b, "Go") }),
-)
-
-// padding
-proton.Pad(win, 16, func(win *proton.Win) { ... })
-proton.PadV(win, 8, func(win *proton.Win) { ... })
-proton.PadH(win, 8, func(win *proton.Win) { ... })
-proton.PadSides(win, top, right, bottom, left, func(win *proton.Win) { ... })
-
-// centering
-proton.Center(win, func(win *proton.Win) { ... })
-
-// blank gap inside a row or column
-proton.Gap(win, 12)
-
-// split panes
-proton.Split(win, 0.3, leftFn, rightFn)
-proton.HSplit(win, 0.4, topFn, bottomFn)
-
-// grid
-proton.Grid(win, 3, 8,
-    func(win *proton.Win) { proton.Label(win, "one") },
-    func(win *proton.Win) { proton.Label(win, "two") },
-    func(win *proton.Win) { proton.Label(win, "three") },
-    func(win *proton.Win) { proton.Label(win, "four") },
-)
-```
+| Function | What it does |
+|---|---|
+| `Column(win, ...fns)` | vertical stack |
+| `Row(win, ...fns)` | horizontal row |
+| `RowSpread(win, ...fns)` | horizontal, space between items |
+| `RowEnd(win, ...fns)` | horizontal, pushed to right |
+| `GrowRow(win, ...children)` | horizontal with stretch control |
+| `GrowColumn(win, ...children)` | vertical with stretch control |
+| `GrowItem(win, fn)` | stretchy child for GrowRow/GrowColumn |
+| `FixedItem(win, fn)` | fixed child for GrowRow/GrowColumn |
+| `Split(win, fraction, left, right)` | side-by-side split pane |
+| `HSplit(win, fraction, top, bottom)` | top-bottom split pane |
+| `Center(win, fn)` | centered in available space |
+| `Pad(win, dp, fn)` | uniform padding |
+| `PadH(win, dp, fn)` | left+right padding |
+| `PadV(win, dp, fn)` | top+bottom padding |
+| `PadSides(win, t, r, b, l, fn)` | per-edge padding |
+| `Gap(win, dp)` | blank space between widgets |
+| `Grid(win, cols, gap, ...fns)` | fixed-column grid |
 
 ## Widgets
 
-| Function | What it does |
-|---|---|
-| `Label(win, text)` | body text |
-| `H1` – `H6(win, text)` | headings |
-| `Body2(win, text)` | smaller body text |
-| `Caption(win, text)` | small caption text |
-| `Text(win, s, size, color, bold)` | custom text |
-| `Button(win, &state, label) bool` | filled button |
-| `OutlineButton(win, &state, label) bool` | ghost button |
-| `IconButton(win, &state, icon, desc) bool` | icon-only button |
-| `Tappable(win, &state, fn) bool` | any content as a button |
-| `Input(win, &state, hint)` | single-line text field |
-| `TextArea(win, &state, hint)` | multi-line text field |
-| `Checkbox(win, &state, label) bool` | checkbox |
-| `RadioButton(win, &group, key, label) bool` | radio button |
-| `Slider(win, &state) float32` | slider, returns 0–1 |
-| `ProgressBar(win, progress)` | progress bar, 0–1 |
-| `List(win, &scroll, n, fn)` | vertical scrolling list |
-| `HList(win, &scroll, n, fn)` | horizontal scrolling list |
-| `Divider(win)` | horizontal rule |
-| `Rect(win, color, w, h)` | filled rectangle |
-| `RoundRect(win, color, w, h, r)` | rounded rectangle |
-| `Card(win, bg, corner, pad, fn)` | content in a card background |
-| `Badge(win, bg, fg, text)` | small colored chip |
-| `Toast(win, &state)` | overlay notification at bottom |
+| Function | Returns | Notes |
+|---|---|---|
+| `Label(win, text)` | — | body text |
+| `H1`–`H6(win, text)` | — | headings |
+| `Body2(win, text)` | — | smaller body |
+| `Caption(win, text)` | — | small text |
+| `Text(win, s, size, color, bold)` | — | custom text |
+| `Button(win, &state, label)` | bool | true if clicked |
+| `OutlineButton(win, &state, label)` | bool | ghost style |
+| `IconButton(win, &state, icon, desc)` | bool | icon only |
+| `Tappable(win, &state, fn)` | bool | custom clickable area |
+| `Input(win, &state, hint)` | — | single-line text field |
+| `TextArea(win, &state, hint)` | — | multi-line text field |
+| `Checkbox(win, &state, label)` | bool | true if changed |
+| `Toggle(win, &state, label)` | bool | switch, true if changed |
+| `RadioButton(win, &group, key, label)` | bool | true if changed |
+| `Slider(win, &state)` | float32 | current value 0–1 |
+| `ProgressBar(win, progress)` | — | 0–1 |
+| `List(win, &scroll, n, fn)` | — | virtual scrolling list |
+| `HList(win, &scroll, n, fn)` | — | horizontal list |
+| `Scroll(win, &scroll, fn)` | — | scrollable content area |
+| `Divider(win)` | — | horizontal rule |
+| `Rect(win, color, w, h)` | — | filled rectangle |
+| `RoundRect(win, color, w, h, r)` | — | rounded rectangle |
+| `Card(win, bg, corner, pad, fn)` | — | content in a card |
+| `Badge(win, bg, fg, text)` | — | small colored chip |
+| `Image(win, img, w, h)` | — | draw an image |
+| `MinSize(win, w, h, fn)` | — | minimum size constraint |
+| `MaxWidth(win, w, fn)` | — | maximum width constraint |
+| `Tooltip(win, &state, tip, fn)` | — | hover tooltip |
+| `Toast(win, &state)` | — | timed notification overlay |
+
+## Keyboard
+
+```go
+// fire a function on Ctrl+S
+proton.OnKey(win, key.ModCtrl, "S", func() { save() })
+
+// fire on Escape
+proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
+```
+
+## Image loading
+
+```go
+// load once at startup
+img, err := proton.LoadImage("photo.png")
+if err != nil {
+    log.Fatal(err)
+}
+
+// draw every frame
+proton.Image(win, img, 200, 150)
+```
+
+## Toast notifications
+
+```go
+type UI struct {
+    toast proton.ToastState
+}
+
+// trigger from anywhere (goroutine-safe)
+u.toast.Show("File saved!", 2*time.Second)
+
+// in your draw function (call last so it renders on top)
+proton.Toast(win, &u.toast)
+```
 
 ## Theming
 
 ```go
-a := proton.New("app")
 a.ApplyPalette(proton.DarkPalette)
 a.ApplyPalette(proton.NordPalette)
 a.ApplyPalette(proton.RosePinePalette)
 a.ApplyPalette(proton.CatppuccinPalette)
 
-// or your own
+// custom
 a.ApplyPalette(proton.Palette{
     Bg:        proton.RGB(0x1e1e2e),
     Fg:        proton.RGB(0xcdd6f4),
@@ -164,14 +162,28 @@ a.ApplyPalette(proton.Palette{
 a.SetFontScale(1.1)
 ```
 
+## State types
+
+Declare these in your UI state struct — no imports beyond `proton` needed:
+
+```go
+type UI struct {
+    btn     proton.Clickable   // button / tappable
+    name    proton.Editor      // input / textarea
+    checked proton.Bool        // checkbox / toggle
+    choice  proton.Enum        // radio group
+    vol     proton.Float       // slider
+    scroll  proton.Scrollable  // list / scroll
+}
+```
+
 ## Examples
 
-All examples live in the same module, so just:
-
 ```
-cd examples/hello && go run .
-cd examples/todo && go run .
-cd examples/calculator && go run .
+go run ./examples/hello
+go run ./examples/todo
+go run ./examples/calculator
+go run ./examples/showcase
 ```
 
 ## License
