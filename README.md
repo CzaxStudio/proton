@@ -2,7 +2,7 @@
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
-## To be published on June 12th 2026. 78% completed.
+<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/c3c4e186-3635-4305-ad25-d4cc562cea0d" />
 
 ```go
 package main
