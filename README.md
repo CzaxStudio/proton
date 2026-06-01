@@ -1,8 +1,6 @@
-
 # Proton
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
-<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/2b84a54b-4313-498a-ae6c-909055eeba1e" />
 
 ```go
 package main
@@ -11,7 +9,6 @@ import "github.com/CzaxStudio/proton"
 
 type UI struct {
     name proton.Editor
-
     btn  proton.Clickable
 }
 
@@ -119,7 +116,7 @@ proton.OnKey(win, key.ModCtrl, "S", func() { save() })
 proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
 ```
 
-## Image loading 
+## Image loading
 
 ```go
 // load once at startup
@@ -231,7 +228,57 @@ go run ./examples/hello
 go run ./examples/todo
 go run ./examples/calculator
 go run ./examples/showcase
+go run ./examples/cybertool
 ```
+
+## Building a Self-Contained App
+
+To build a standalone executable for your OS, run:
+
+```bash
+# Windows
+go build -o CyberTool.exe ./examples/cybertool/main.go
+
+# Linux/macOS
+go build -o CyberTool ./examples/cybertool/main.go
+```
+
+For cross-platform distribution, you can use the provided `build.sh` or `build.bat` scripts to generate binaries for Windows, macOS, and Linux simultaneously.
+
+## User Installation Guide (From Scratch)
+
+If you are a new user and want to run Proton apps, follow these steps:
+
+### 1. Install Go
+Download and install Go (1.22+) from [go.dev](https://go.dev/dl/).
+
+### 2. Install System Dependencies
+Only required for **Linux** users:
+```bash
+sudo apt install libwayland-dev libxkbcommon-dev libvulkan-dev
+```
+
+### 3. Clone and Run
+```bash
+# Clone the repository
+git clone https://github.com/CzaxStudio/proton.git
+cd proton
+
+# Download dependencies
+go mod tidy
+
+# Run the CyberTool example
+go run ./examples/cybertool
+```
+
+### 4. Direct Install (Into your own project)
+To use Proton in your own project:
+```bash
+mkdir myapp && cd myapp
+go mod init myapp
+go get github.com/CzaxStudio/proton
+```
+Copy any example code into `main.go` and run `go run .`.
 
 ## Proton CLI
 
