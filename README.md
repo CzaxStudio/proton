@@ -1,6 +1,8 @@
+
 # Proton
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
+<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/2b84a54b-4313-498a-ae6c-909055eeba1e" />
 
 ```go
 package main
@@ -9,6 +11,7 @@ import "github.com/CzaxStudio/proton"
 
 type UI struct {
     name proton.Editor
+
     btn  proton.Clickable
 }
 
