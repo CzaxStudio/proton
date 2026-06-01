@@ -9,10 +9,9 @@ A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
 # Logo
 
-<img width="1000" height="600" alt="Proton" src="https://github.com/user-attachments/assets/f947cdd4-8f71-4efc-9bee-0970359e1cf1" />
+<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/e044d0b8-a96f-4bc2-9df9-725a41a99ed2" />
 
-
-
+# Getting started
 
 ```go
 package main
