@@ -1,8 +1,8 @@
 # Proton
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
+<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/ce3d428e-dbab-4e84-a29c-f8f4cec9b870" />
 
-<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/c3c4e186-3635-4305-ad25-d4cc562cea0d" />
 
 ```go
 package main
@@ -186,6 +186,39 @@ go run ./examples/hello
 go run ./examples/todo
 go run ./examples/calculator
 go run ./examples/showcase
+```
+
+## Proton CLI
+
+Proton includes a CLI tool for embedding assets.
+
+### Install
+
+```bash
+go install github.com/CzaxStudio/proton/cmd/Proton@latest
+```
+
+### Adding a logo
+
+To add a logo to your project:
+
+```bash
+Proton logo path/to/image.png
+```
+
+This copies the image and creates `logo_gen.go`. Usage in code:
+
+```go
+func main() {
+    a := proton.New("My App")
+    a.SetLogo(Logo_data) // loads image once at startup
+
+    a.Window("My App", 400, 300, func(win *proton.Win) {
+        proton.Logo(win, 64, 64) // uses cached logo
+        proton.H3(win, "Welcome")
+    })
+    a.Run()
+}
 ```
 
 ## License
