@@ -6,15 +6,15 @@ A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
 Will be added ASAP:)
 
-# Example apps (made using Proton)
+## Example apps (made using Proton)
 
-*Note --> These are very basic, you can make even better apps.
+### Note --> These are very basic, you can make even better apps.
 
 <img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
 
 <img width="683" height="360" alt="Example app 2" src="https://github.com/user-attachments/assets/d536a863-d010-4dc4-b223-b790b00c8478" />
 
-# Logo
+## Logo
 
 <img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/e044d0b8-a96f-4bc2-9df9-725a41a99ed2" />
 
