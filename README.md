@@ -1,8 +1,6 @@
 # Proton
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
-<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/ce3d428e-dbab-4e84-a29c-f8f4cec9b870" />
-
 
 ```go
 package main
@@ -118,7 +116,7 @@ proton.OnKey(win, key.ModCtrl, "S", func() { save() })
 proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
 ```
 
-## Image loading
+## Image loading 
 
 ```go
 // load once at startup
@@ -147,21 +145,65 @@ proton.Toast(win, &u.toast)
 
 ## Theming
 
+### Built-in Palettes
 ```go
 a.ApplyPalette(proton.DarkPalette)
 a.ApplyPalette(proton.NordPalette)
 a.ApplyPalette(proton.RosePinePalette)
 a.ApplyPalette(proton.CatppuccinPalette)
+```
 
-// custom
+### Background Color
+You can set a custom background color directly (infinite options):
+```go
+a.SetBackground(proton.RGB(0x1a1b26)) // Hex code
+a.SetBackground(proton.RGBA(20, 20, 20, 255)) // RGBA values
+```
+
+### Custom Palette Properties
+The `proton.Palette` struct controls these areas:
+| Property | Description |
+|---|---|
+| `Bg` | Main window background color |
+| `Fg` | Default text and icon color |
+| `Primary` | Accent color (Buttons, Sliders, Progress) |
+| `PrimaryFg` | Text color inside primary elements |
+
+### Copy-Paste Theme Presets
+
+**Hacker Green (Matrix Style)**
+```go
 a.ApplyPalette(proton.Palette{
-    Bg:        proton.RGB(0x1e1e2e),
-    Fg:        proton.RGB(0xcdd6f4),
-    Primary:   proton.RGB(0x89b4fa),
-    PrimaryFg: proton.RGB(0x1e1e2e),
+    Bg:        proton.RGB(0x000000), // Black
+    Fg:        proton.RGB(0x00FF00), // Hacker Green
+    Primary:   proton.RGB(0x008F11), // Dark Green
+    PrimaryFg: proton.RGB(0x000000),
 })
+```
 
-a.SetFontScale(1.1)
+**Midnight Ocean**
+```go
+a.ApplyPalette(proton.Palette{
+    Bg:        proton.RGB(0x0f172a), // Navy
+    Fg:        proton.RGB(0xf8fafc), // Off-white
+    Primary:   proton.RGB(0x38bdf8), // Sky Blue
+    PrimaryFg: proton.RGB(0x0f172a),
+})
+```
+
+**Cyberpunk Red**
+```go
+a.ApplyPalette(proton.Palette{
+    Bg:        proton.RGB(0x1a0b0b), // Deep Red-Black
+    Fg:        proton.RGB(0xff2a6d), // Neon Pink
+    Primary:   proton.RGB(0xd1ff00), // Neon Lime
+    PrimaryFg: proton.RGB(0x000000),
+})
+```
+
+**Font Scaling**
+```go
+a.SetFontScale(1.1) 
 ```
 
 ## State types
@@ -170,12 +212,12 @@ Declare these in your UI state struct — no imports beyond `proton` needed:
 
 ```go
 type UI struct {
-    btn     proton.Clickable   // button / tappable
-    name    proton.Editor      // input / textarea
-    checked proton.Bool        // checkbox / toggle
-    choice  proton.Enum        // radio group
-    vol     proton.Float       // slider
-    scroll  proton.Scrollable  // list / scroll
+    btn     proton.Clickable   
+    name    proton.Editor      
+    checked proton.Bool        
+    choice  proton.Enum       
+    vol     proton.Float       
+    scroll  proton.Scrollable  
 }
 ```
 
