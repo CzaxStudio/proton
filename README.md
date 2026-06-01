@@ -2,6 +2,18 @@
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
+# Example apps
+<img width="683" height="360" alt="Example app" src="https://github.com/user-attachments/assets/b143c547-17b0-4fe8-b5dd-9f458c3e5f26" />
+
+<img width="683" height="360" alt="Example app 2" src="https://github.com/user-attachments/assets/d536a863-d010-4dc4-b223-b790b00c8478" />
+
+# Logo
+
+<img width="683" height="360" alt="Proton" src="https://github.com/user-attachments/assets/f947cdd4-8f71-4efc-9bee-0970359e1cf1" />
+
+
+
+
 ```go
 package main
 
