@@ -2,10 +2,6 @@
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
-## Documentation 
-
-Will be added ASAP:)
-
 ## Example apps (made using Proton)
 
 ### Note --> These are very basic, you can make even better apps.
@@ -58,6 +54,10 @@ apt install libwayland-dev libxkbcommon-dev libvulkan-dev
 ```
 
 macOS and Windows need nothing extra.
+
+## Documentation 
+
+Will be added ASAP:)
 
 ## How it works
 
