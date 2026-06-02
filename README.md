@@ -1,6 +1,9 @@
 # Proton
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
+## Documentation 
+
+#### https://github.com/CzaxStudio/proton-documentation
 
 ## Example apps (made using Proton)
 
@@ -57,9 +60,7 @@ apt install libwayland-dev libxkbcommon-dev libvulkan-dev
 
 macOS and Windows need nothing extra.
 
-## Documentation 
 
-#### Will be added ASAP
 
 ## How it works
 
