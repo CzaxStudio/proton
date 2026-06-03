@@ -308,7 +308,7 @@ Proton includes a CLI tool for embedding assets.
 ### Install
 
 ```bash
-go install github.com/CzaxStudio/proton/cmd/Proton@latest
+go install github.com/CzaxStudio/proton
 ```
 
 ### Adding a logo
