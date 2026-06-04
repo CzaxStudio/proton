@@ -1,5 +1,7 @@
 # Proton
 
+[![Go Report Card](https://goreportcard.com)](https://goreportcard.com)
+
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 ## Documentation 
 
