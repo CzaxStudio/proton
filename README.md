@@ -1,4 +1,4 @@
-# Proton
+# Proton v0.6
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton)
 
@@ -8,7 +8,6 @@ A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 #### https://github.com/CzaxStudio/proton-documentation
 
 ## Example apps (made using Proton)
-
 
 ### Note: These are very basic, you can make even better apps.
 
