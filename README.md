@@ -1,6 +1,6 @@
 # Proton
 
-[![Go Report Card](https://goreportcard.com)](https://goreportcard.com)
+[![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton)
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 ## Documentation 
