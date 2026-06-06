@@ -14,7 +14,8 @@ A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
 <img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
 
-<img width="813" height="508" alt="Demo2" src="https://github.com/user-attachments/assets/a7f385d0-531c-4dcd-bf7b-ca23e1cfcff8" />
+<img width="813" height="508" alt="Demo2" src="https://github.com/user-attachments/assets/af7552c4-107f-4760-835a-1ae736f49358" />
+
 
 
 ## Logo
