@@ -1,6 +1,6 @@
-# Proton v0.6
+# Proton v0.8
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton)
+[![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
 A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 ## Documentation 
