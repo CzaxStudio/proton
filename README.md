@@ -29,7 +29,7 @@ THIS WILL BE PRESENT TILL THIS PROJECT EXISTS
 
 ## Example apps (made using Proton)
 
-### Note: These are very basic, you can make even better apps.
+### Note: I have created basic apps, you can create even better apps with Proton.
 
 
 <img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
