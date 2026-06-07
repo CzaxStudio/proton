@@ -7,6 +7,7 @@ A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 ## Our First Stargazers
 
 Thank you to the early adopters who supported Proton from the very beginning!
+
 THIS WILL BE PRESENT TILL THIS PROJECT EXISTS
 
 <table>
