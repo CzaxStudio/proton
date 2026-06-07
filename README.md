@@ -17,8 +17,9 @@ THIS WILL BE PRESENT TILL THIS PROJECT EXISTS
     <td align="center"><a href="https://github.com/aurax"><img src="https://github.com/aurax.png?size=100" width="100px;" alt=""/><br /><sub><b>@aurax</b></sub></a></td>
     <td align="center"><a href="https://github.com/DemonK1"><img src="https://github.com/DemonK1.png?size=100" width="100px;" alt=""/><br /><sub><b>@DemonK1</b></sub></a></td>
     <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a></td>
-    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a></td>
-  </tr>
+    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a>
+</td>
+</tr>
 </table>
 
 ## Documentation 
