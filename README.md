@@ -12,7 +12,7 @@ THIS WILL BE PRESENT TILL THIS PROJECT EXISTS
 
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu</b></sub></a></td>
+    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu(First Stargazer)</b></sub></a></td>
     <td align="center"><a href="https://github.com/bigwhite"><img src="https://github.com/bigwhite.png?size=100" width="100px;" alt=""/><br /><sub><b>@bigwhite</b></sub></a></td>
     <td align="center"><a href="https://github.com/TanmayCzax"><img src="https://github.com/TanmayCzax.png?size=100" width="100px;" alt=""/><br /><sub><b>@TanmayCzax</b></sub></a></td>
     <td align="center"><a href="https://github.com/aurax"><img src="https://github.com/aurax.png?size=100" width="100px;" alt=""/><br /><sub><b>@aurax</b></sub></a></td>
