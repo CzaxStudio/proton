@@ -24,8 +24,6 @@ A-Solo-Engineer
     </td>
     
 </tr>
-<td align="center"><a href="https://github.com/A-Solo-Engineer"><img src="https://github.com/A-Solo-Engineer?size=100" width="100px;" alt=""/><br /><sub><b>@A-Solo-Engineer</b></sub></a>
-</td>
 </table>
 
 ## Documentation 
