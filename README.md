@@ -10,7 +10,6 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 THIS WILL BE PRESENT TILL THIS PROJECT EXISTS
 
-A-Solo-Engineer
 <table>
   <tr>
     <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu(First Stargazer)</b></sub></a></td>
