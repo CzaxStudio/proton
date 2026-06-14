@@ -20,7 +20,10 @@ THIS WILL BE PRESENT TILL THIS PROJECT EXISTS
     <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a></td>
     <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a>
 </td>
+</td>
     </td>
+<td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a>
+</td>
     
 </tr>
 </table>
