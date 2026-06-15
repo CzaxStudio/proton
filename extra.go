@@ -1,7 +1,6 @@
 package proton
 
 // extra.go — additional widgets that build on the core.
-// This is also a core part of the library
 
 import (
 	"image"
@@ -556,9 +555,9 @@ func If(win *Win, cond bool, content func(*Win)) {
 //	    println("clicked")
 //	}
 func HoverCard(win *Win, state *Clickable, bg, hover color.NRGBA, cornerDp float32, content func(*Win)) bool {
-	var clicked bool
+	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		clicked = state.Clicked(gtx)
+		clickResults[state] = state.Clicked(gtx)
 		return state.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 			currentBg := bg
 			if state.Hovered() {
@@ -577,5 +576,5 @@ func HoverCard(win *Win, state *Clickable, bg, hover color.NRGBA, cornerDp float
 			)
 		})
 	})
-	return clicked
+	return result
 }
