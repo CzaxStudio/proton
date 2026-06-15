@@ -23,9 +23,8 @@ alanmsant2
     <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a>
 </td>
 </td>
-    </td>
-<td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille?size=100" width="100px;" alt=""/><br /><sub><b> @gorilacrocodille</b></sub></a>
-    </td>
+ </td>
+    <td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille.png?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a></td>   
 </td>
     <td align="center"><a href="https://github.com/alanmsant2"><img src="https://github.com/alanmsant2.png?size=100" width="100px;" alt=""/><br /><sub><b>@alanmsant2</b></sub></a></td>
     
