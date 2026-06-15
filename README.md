@@ -1,8 +1,8 @@
-# Proton v0.8
+# Proton
+
+A GUI library for Go that doesn't make you want to switch to web dev.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
-
-A GUI library for Go. Built on [Gio](https://gioui.org). No C deps, pure Go.
 
 ## Our First Stargazers
 
@@ -88,279 +88,180 @@ apt install libwayland-dev libxkbcommon-dev libvulkan-dev
 
 macOS and Windows need nothing extra.
 
-
+---
 
 ## How it works
 
-Gio is immediate mode — your draw function runs every frame. Widgets called
-directly in your draw function stack vertically by default. Use `Row()` or
-`Column()` for other arrangements.
-
-State (button clicks, text, checkboxes) lives in your own structs using
-Proton's re-exported types so you only need one import.
-
-## Layouts
-
-| Function | What it does |
-|---|---|
-| `Column(win, ...fns)` | vertical stack |
-| `Row(win, ...fns)` | horizontal row |
-| `RowSpread(win, ...fns)` | horizontal, space between items |
-| `RowEnd(win, ...fns)` | horizontal, pushed to right |
-| `GrowRow(win, ...children)` | horizontal with stretch control |
-| `GrowColumn(win, ...children)` | vertical with stretch control |
-| `GrowItem(win, fn)` | stretchy child for GrowRow/GrowColumn |
-| `FixedItem(win, fn)` | fixed child for GrowRow/GrowColumn |
-| `Split(win, fraction, left, right)` | side-by-side split pane |
-| `HSplit(win, fraction, top, bottom)` | top-bottom split pane |
-| `Center(win, fn)` | centered in available space |
-| `Pad(win, dp, fn)` | uniform padding |
-| `PadH(win, dp, fn)` | left+right padding |
-| `PadV(win, dp, fn)` | top+bottom padding |
-| `PadSides(win, t, r, b, l, fn)` | per-edge padding |
-| `Gap(win, dp)` | blank space between widgets |
-| `Grid(win, cols, gap, ...fns)` | fixed-column grid |
-
-## Widgets
-
-| Function | Returns | Notes |
-|---|---|---|
-| `Label(win, text)` | — | body text |
-| `H1`–`H6(win, text)` | — | headings |
-| `Body2(win, text)` | — | smaller body |
-| `Caption(win, text)` | — | small text |
-| `Text(win, s, size, color, bold)` | — | custom text |
-| `Button(win, &state, label)` | bool | true if clicked |
-| `OutlineButton(win, &state, label)` | bool | ghost style |
-| `IconButton(win, &state, icon, desc)` | bool | icon only |
-| `Tappable(win, &state, fn)` | bool | custom clickable area |
-| `Input(win, &state, hint)` | — | single-line text field |
-| `TextArea(win, &state, hint)` | — | multi-line text field |
-| `Checkbox(win, &state, label)` | bool | true if changed |
-| `Toggle(win, &state, label)` | bool | switch, true if changed |
-| `RadioButton(win, &group, key, label)` | bool | true if changed |
-| `Slider(win, &state)` | float32 | current value 0–1 |
-| `ProgressBar(win, progress)` | — | 0–1 |
-| `List(win, &scroll, n, fn)` | — | virtual scrolling list |
-| `HList(win, &scroll, n, fn)` | — | horizontal list |
-| `Scroll(win, &scroll, fn)` | — | scrollable content area |
-| `Divider(win)` | — | horizontal rule |
-| `Rect(win, color, w, h)` | — | filled rectangle |
-| `RoundRect(win, color, w, h, r)` | — | rounded rectangle |
-| `Card(win, bg, corner, pad, fn)` | — | content in a card |
-| `Badge(win, bg, fg, text)` | — | small colored chip |
-| `Image(win, img, w, h)` | — | draw an image |
-| `MinSize(win, w, h, fn)` | — | minimum size constraint |
-| `MaxWidth(win, w, fn)` | — | maximum width constraint |
-| `Tooltip(win, &state, tip, fn)` | — | hover tooltip |
-| `Toast(win, &state)` | — | timed notification overlay |
-
-## Keyboard
-
-```go
-// fire a function on Ctrl+S
-proton.OnKey(win, key.ModCtrl, "S", func() { save() })
-
-// fire on Escape
-proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
-```
-
-## Image loading
-
-```go
-// load once at startup
-img, err := proton.LoadImage("photo.png")
-if err != nil {
-    log.Fatal(err)
-}
-
-// draw every frame
-proton.Image(win, img, 200, 150)
-```
-
-## Toast notifications
+Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct using Proton's re-exported types, so you only ever need one import.
 
 ```go
 type UI struct {
-    toast proton.ToastState
+    btn     proton.Clickable    // button
+    name    proton.Editor       // text input
+    checked proton.Bool         // checkbox / toggle
+    choice  proton.Enum         // radio group
+    vol     proton.Float        // slider
+    scroll  proton.Scrollable   // list / scroll area
 }
-
-// trigger from anywhere (goroutine-safe)
-u.toast.Show("File saved!", 2*time.Second)
-
-// in your draw function (call last so it renders on top)
-proton.Toast(win, &u.toast)
 ```
+
+---
+
+## Widgets
+
+### Text
+`Label` `H1`–`H6` `Body2` `Caption` `Text` `Muted` `ColoredText` `ErrorText` `SuccessText` `WarningText`
+
+### Buttons
+`Button` `OutlineButton` `IconButton` `Tappable` `Link` `LinkSmall`
+
+### Inputs
+`Input` `TextArea` `Checkbox` `Toggle` `RadioButton` `Slider` `ProgressBar` `NumberInput` `SelectBox`
+
+### Lists
+`List` `HList` `Scroll` `TextView` `LogView`
+
+### Layout
+`Row` `Column` `RowSpread` `RowEnd` `GrowRow` `GrowColumn` `GrowItem` `FixedItem` `FlexSpacer`
+`Split` `HSplit` `ResizeSplit` `ResizeHSplit` `Center` `ZStack`
+`Pad` `PadH` `PadV` `PadSides` `Gap` `Grid` `MinSize` `MaxWidth`
+
+### Visual
+`Divider` `LabeledDivider` `Rect` `RoundRect` `Card` `HoverCard` `Badge` `StatusDot`
+`Image` `CodeBlock` `ShortcutHint` `ColorSwatch`
+
+### Feedback
+`Toast` `Alert` `AlertDismissable` `Tooltip` `Spinner`
+
+### Overlays & Dialogs
+`Overlay` `Tabs` `Accordion` `ContextMenu`
+
+### Utilities
+`If` `OnKey` `FocusArea`
+
+---
+
+## Layout
+
+Widgets stack vertically by default. Use `Row` or `Column` to group them differently.
+
+```go
+// side by side
+proton.Row(win,
+    func(win *proton.Win) { proton.Label(win, "left") },
+    func(win *proton.Win) { proton.Label(win, "right") },
+)
+
+// one child fills remaining space
+proton.GrowRow(win,
+    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "Search:") }),
+    proton.GrowItem(win, func(win *proton.Win) { proton.Input(win, &e, "") }),
+    proton.FixedItem(win, func(win *proton.Win) { proton.Button(win, &b, "Go") }),
+)
+
+// split pane (draggable)
+proton.ResizeSplit(win, &u.split, 0.35, leftFn, rightFn)
+
+// padding
+proton.Pad(win, 16, func(win *proton.Win) { ... })
+proton.PadSides(win, 8, 16, 8, 16, func(win *proton.Win) { ... })
+
+// blank gap
+proton.Gap(win, 12)
+```
+
+---
 
 ## Theming
 
-### Built-in Palettes
 ```go
 a.ApplyPalette(proton.DarkPalette)
 a.ApplyPalette(proton.NordPalette)
 a.ApplyPalette(proton.RosePinePalette)
 a.ApplyPalette(proton.CatppuccinPalette)
-```
 
-### Background Color
-You can set a custom background color directly (infinite options):
-```go
-a.SetBackground(proton.RGB(0x1a1b26)) // Hex code
-a.SetBackground(proton.RGBA(20, 20, 20, 255)) // RGBA values
-```
-
-### Custom Palette Properties
-The `proton.Palette` struct controls these areas:
-| Property | Description |
-|---|---|
-| `Bg` | Main window background color |
-| `Fg` | Default text and icon color |
-| `Primary` | Accent color (Buttons, Sliders, Progress) |
-| `PrimaryFg` | Text color inside primary elements |
-
-### Copy-Paste Theme Presets
-
-**Hacker Green (Matrix Style)**
-```go
+// custom
 a.ApplyPalette(proton.Palette{
-    Bg:        proton.RGB(0x000000), // Black
-    Fg:        proton.RGB(0x00FF00), // Hacker Green
-    Primary:   proton.RGB(0x008F11), // Dark Green
-    PrimaryFg: proton.RGB(0x000000),
+    Bg:        proton.RGB(0x1e1e2e),
+    Fg:        proton.RGB(0xcdd6f4),
+    Primary:   proton.RGB(0x89b4fa),
+    PrimaryFg: proton.RGB(0x1e1e2e),
 })
+
+a.SetFontScale(1.1)
 ```
 
-**Midnight Ocean**
-```go
-a.ApplyPalette(proton.Palette{
-    Bg:        proton.RGB(0x0f172a), // Navy
-    Fg:        proton.RGB(0xf8fafc), // Off-white
-    Primary:   proton.RGB(0x38bdf8), // Sky Blue
-    PrimaryFg: proton.RGB(0x0f172a),
-})
-```
+---
 
-**Cyberpunk Red**
-```go
-a.ApplyPalette(proton.Palette{
-    Bg:        proton.RGB(0x1a0b0b), // Deep Red-Black
-    Fg:        proton.RGB(0xff2a6d), // Neon Pink
-    Primary:   proton.RGB(0xd1ff00), // Neon Lime
-    PrimaryFg: proton.RGB(0x000000),
-})
-```
-
-**Font Scaling**
-```go
-a.SetFontScale(1.1) 
-```
-
-## State types
-
-Declare these in your UI state struct — no imports beyond `proton` needed:
+## Alerts and Feedback
 
 ```go
-type UI struct {
-    btn     proton.Clickable   
-    name    proton.Editor      
-    checked proton.Bool        
-    choice  proton.Enum       
-    vol     proton.Float       
-    scroll  proton.Scrollable  
+proton.Alert(win, proton.AlertInfo,    "Informational message.")
+proton.Alert(win, proton.AlertSuccess, "Operation completed.")
+proton.Alert(win, proton.AlertWarning, "Proceed with caution.")
+proton.Alert(win, proton.AlertError,   "Something went wrong.")
+
+// dismissable
+if proton.AlertDismissable(win, &u.closeBtn, proton.AlertInfo, "Click × to close") {
+    u.showAlert = false
 }
+
+// toast — call last in your draw function
+u.toast.Show("Saved!", 2*time.Second)
+proton.Toast(win, &u.toast)
 ```
+
+---
+
+## Async updates
+
+```go
+go func() {
+    result := fetchFromAPI()
+    u.data = result
+    win.Invalidate() // ask for a redraw
+}()
+```
+
+---
+
+## Keyboard shortcuts
+
+```go
+proton.OnKey(win, key.ModCtrl, "S", func() { save() })
+proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
+```
+
+---
 
 ## Examples
 
-```
-go run ./examples/hello
-go run ./examples/todo
-go run ./examples/calculator
-go run ./examples/showcase
-go run ./examples/cybertool
-```
-
-## Building a Self-Contained App
-
-To build a standalone executable for your OS, run:
-
 ```bash
-# Windows
-go build -o CyberTool.exe ./examples/cybertool/main.go
-
-# Linux/macOS
-go build -o CyberTool ./examples/cybertool/main.go
+go run ./examples/hello        # 7 lines, one window
+go run ./examples/todo         # classic todo list
+go run ./examples/calculator   # buttons and state
+go run ./examples/showcase     # layout and theming demo
+go run ./examples/kitchen      # every widget in one place
 ```
 
-For cross-platform distribution, you can use the provided `build.sh` or `build.bat` scripts to generate binaries for Windows, macOS, and Linux simultaneously.
+---
 
-## User Installation Guide (From Scratch)
+## Docs
 
-If you are a new user and want to run Proton apps, follow these steps:
+See the [`docs`]((https://github.com/CzaxStudio/proton-documentation)) repo for detailed per-topic guides:
 
-### 1. Install Go
-Download and install Go (1.22+) from [go.dev](https://go.dev/dl/).
+- [Getting started]
+- [Text]
+- [Buttons]
+- [Inputs]
+- [Layout]
+- [Lists]
+- [Visuals]
+- [Theming]
+- [Advanced]
+- [Examples]
 
-### 2. Install System Dependencies
-Only required for **Linux** users:
-```bash
-sudo apt install libwayland-dev libxkbcommon-dev libvulkan-dev
-```
-
-### 3. Clone and Run
-```bash
-# Clone the repository
-git clone https://github.com/CzaxStudio/proton.git
-cd proton
-
-# Download dependencies
-go mod tidy
-
-# Run the CyberTool example
-go run ./examples/cybertool
-```
-
-### 4. Direct Install (Into your own project)
-To use Proton in your own project:
-```bash
-mkdir myapp && cd myapp
-go mod init myapp
-go get github.com/CzaxStudio/proton
-```
-Copy any example code into `main.go` and run `go run .`.
-
-## Proton CLI
-
-Proton includes a CLI tool for embedding assets.
-
-### Install
-
-```bash
-go install github.com/CzaxStudio/proton
-```
-
-### Adding a logo
-
-To add a logo to your project:
-
-```bash
-Proton logo path/to/image.png
-```
-
-This copies the image and creates `logo_gen.go`. Usage in code:
-
-```go
-func main() {
-    a := proton.New("My App")
-    a.SetLogo(Logo_data) // loads image once at startup
-
-    a.Window("My App", 400, 300, func(win *proton.Win) {
-        proton.Logo(win, 64, 64) // uses cached logo
-        proton.H3(win, "Welcome")
-    })
-    a.Run()
-}
-```
+---
 
 ## License
 
