@@ -1,3 +1,3 @@
-Set-Content -Path .gitignore -Value "vendor/"
-Set-Content -Path .gitignore -Value "Website"
+vendor/
+Website/
 
