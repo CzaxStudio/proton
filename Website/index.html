@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Proton — GUI for Go</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,700;1,9..144,300&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0c0c0e;
+  --bg2:      #111116;
+  --bg3:      #18181f;
+  --line:     #222230;
+  --muted:    #4a4a60;
+  --dim:      #7a7a96;
+  --fg:       #c8c8dc;
+  --bright:   #eeeef8;
+  --accent:   #7c6af7;
+  --accent2:  #a78bfa;
+  --green:    #4ade80;
+  --red:      #f87171;
+  --yellow:   #fbbf24;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 300;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ---- noise overlay ---- */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.4;
+}
+
+/* ---- nav ---- */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  background: rgba(12,12,14,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--line);
+}
+
+.nav-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--bright);
+  letter-spacing: -0.5px;
+}
+
+.nav-logo span {
+  color: var(--accent2);
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  list-style: none;
+}
+
+.nav-links a {
+  color: var(--dim);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--bright); }
+
+.nav-cta {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  padding: 9px 20px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  letter-spacing: 0.02em;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.nav-cta:hover { background: var(--accent2); transform: translateY(-1px); }
+
+/* ---- hero ---- */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 120px 48px 80px;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(var(--line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--line) 1px, transparent 1px);
+  background-size: 64px 64px;
+  opacity: 0.3;
+  mask-image: radial-gradient(ellipse 80% 60% at 50% 40%, black 20%, transparent 70%);
+}
+
+.hero-glow {
+  position: absolute;
+  width: 700px;
+  height: 700px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,106,247,0.12) 0%, transparent 65%);
+  top: -100px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.hero-inner {
+  position: relative;
+  max-width: 860px;
+}
+
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(124,106,247,0.12);
+  border: 1px solid rgba(124,106,247,0.3);
+  color: var(--accent2);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 5px 14px;
+  border-radius: 100px;
+  margin-bottom: 36px;
+  letter-spacing: 0.05em;
+}
+
+.hero-tag::before {
+  content: '';
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--green);
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.3; }
+}
+
+h1 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(52px, 7vw, 96px);
+  font-weight: 700;
+  line-height: 1.0;
+  letter-spacing: -2px;
+  color: var(--bright);
+  margin-bottom: 28px;
+}
+
+h1 em {
+  font-style: italic;
+  color: var(--accent2);
+}
+
+.hero-sub {
+  font-size: 18px;
+  color: var(--dim);
+  max-width: 500px;
+  line-height: 1.7;
+  font-weight: 300;
+  margin-bottom: 48px;
+}
+
+.hero-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--accent);
+  color: #fff;
+  padding: 14px 28px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 0 0 0 rgba(124,106,247,0);
+}
+
+.btn-primary:hover {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(124,106,247,0.35);
+}
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--dim);
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-family: 'DM Mono', monospace;
+  font-weight: 400;
+  cursor: pointer;
+  border: 1px solid var(--line);
+  text-decoration: none;
+  background: transparent;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.btn-secondary:hover {
+  color: var(--bright);
+  border-color: var(--muted);
+}
+
+.os-note {
+  margin-top: 16px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- code block ---- */
+.hero-code {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 44%;
+  max-width: 540px;
+}
+
+.code-window {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+.code-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--line);
+  background: var(--bg3);
+}
+
+.dot { width: 12px; height: 12px; border-radius: 50%; }
+.dot.red { background: #ff5f57; }
+.dot.yellow { background: #ffbd2e; }
+.dot.green { background: #28c840; }
+
+.code-filename {
+  margin-left: 8px;
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.code-body {
+  padding: 24px 28px;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  line-height: 1.9;
+  overflow-x: auto;
+}
+
+.ln { color: var(--muted); user-select: none; margin-right: 20px; font-size: 11px; }
+.kw { color: #bd93f9; }
+.fn { color: #50fa7b; }
+.st { color: #f1fa8c; }
+.cm { color: var(--muted); font-style: italic; }
+.ty { color: #8be9fd; }
+.pk { color: #ff79c6; }
+
+/* ---- section base ---- */
+section {
+  padding: 100px 48px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 16px;
+}
+
+h2 {
+  font-family: 'Fraunces', serif;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 700;
+  color: var(--bright);
+  letter-spacing: -1px;
+  line-height: 1.1;
+  margin-bottom: 16px;
+}
+
+.section-desc {
+  color: var(--dim);
+  font-size: 17px;
+  max-width: 480px;
+  line-height: 1.7;
+}
+
+/* ---- divider line ---- */
+.rule {
+  border: none;
+  border-top: 1px solid var(--line);
+  margin: 0;
+}
+
+/* ---- features ---- */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1px;
+  background: var(--line);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-top: 64px;
+}
+
+.feature {
+  background: var(--bg);
+  padding: 40px 36px;
+  transition: background 0.2s;
+}
+
+.feature:hover { background: var(--bg2); }
+
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  background: var(--bg3);
+}
+
+.feature-icon svg { width: 18px; height: 18px; stroke: var(--accent2); fill: none; stroke-width: 1.5; }
+
+.feature h3 {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--bright);
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+
+.feature p {
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.7;
+}
+
+/* ---- how it works ---- */
+#how { background: var(--bg2); padding: 100px 0; }
+
+#how .inner { max-width: 1200px; margin: 0 auto; padding: 0 48px; }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 48px;
+  margin-top: 64px;
+}
+
+.step-num {
+  font-family: 'Fraunces', serif;
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--line);
+  line-height: 1;
+  margin-bottom: 20px;
+}
+
+.step h3 {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 17px;
+  font-weight: 500;
+  color: var(--bright);
+  margin-bottom: 10px;
+}
+
+.step p {
+  font-size: 14px;
+  color: var(--dim);
+  line-height: 1.7;
+}
+
+.step code {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  background: var(--bg3);
+  border: 1px solid var(--line);
+  padding: 2px 7px;
+  border-radius: 4px;
+  color: var(--accent2);
+}
+
+/* ---- install strip ---- */
+.install-strip {
+  background: var(--bg3);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 32px 48px;
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.install-label {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.install-cmd {
+  flex: 1;
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  color: var(--green);
+  letter-spacing: 0.02em;
+}
+
+.copy-btn {
+  background: none;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  padding: 7px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+}
+
+.copy-btn:hover { color: var(--bright); border-color: var(--muted); }
+
+/* ---- widget showcase ---- */
+.widget-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 56px;
+}
+
+.widget-item {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 20px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.widget-item:hover {
+  border-color: rgba(124,106,247,0.4);
+  background: var(--bg3);
+}
+
+.widget-name {
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  color: var(--accent2);
+  margin-bottom: 4px;
+}
+
+.widget-desc {
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- download section ---- */
+#download {
+  text-align: center;
+  padding: 120px 48px;
+  position: relative;
+  overflow: hidden;
+}
+
+.download-glow {
+  position: absolute;
+  width: 600px;
+  height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124,106,247,0.1) 0%, transparent 65%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+#download h2 { margin-bottom: 16px; }
+
+.download-sub {
+  color: var(--dim);
+  font-size: 17px;
+  margin-bottom: 56px;
+}
+
+.download-cards {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.dl-card {
+  background: var(--bg2);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 32px 36px;
+  width: 220px;
+  text-decoration: none;
+  transition: border-color 0.25s, background 0.25s, transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+
+.dl-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  opacity: 0;
+  transition: opacity 0.25s;
+}
+
+.dl-card.win::before  { background: var(--accent2); }
+.dl-card.mac::before  { background: var(--fg); }
+.dl-card.linux::before { background: var(--yellow); }
+
+.dl-card:hover {
+  border-color: var(--muted);
+  background: var(--bg3);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+}
+
+.dl-card:hover::before { opacity: 1; }
+
+.dl-icon {
+  margin-bottom: 16px;
+}
+
+.dl-icon svg {
+  width: 36px;
+  height: 36px;
+  fill: none;
+  stroke-width: 1.2;
+}
+
+.dl-card.win  .dl-icon svg { stroke: var(--accent2); }
+.dl-card.mac  .dl-icon svg { stroke: var(--fg); }
+.dl-card.linux .dl-icon svg { stroke: var(--yellow); }
+
+.dl-os {
+  font-family: 'Fraunces', serif;
+  font-size: 22px;
+  font-weight: 400;
+  color: var(--bright);
+  margin-bottom: 4px;
+}
+
+.dl-sub {
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* auto-detect button */
+.dl-auto {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+}
+
+#auto-dl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--accent);
+  color: #fff;
+  padding: 16px 36px;
+  border-radius: 8px;
+  font-size: 16px;
+  font-family: 'DM Sans', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 0 0 0 rgba(124,106,247,0);
+}
+
+#auto-dl-btn:hover {
+  background: var(--accent2);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 36px rgba(124,106,247,0.4);
+}
+
+#auto-dl-btn svg {
+  width: 20px; height: 20px;
+  fill: none; stroke: white; stroke-width: 1.8;
+}
+
+#detected-os {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- palettes showcase ---- */
+.palette-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 56px;
+  flex-wrap: wrap;
+}
+
+.palette-card {
+  flex: 1;
+  min-width: 160px;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--line);
+}
+
+.palette-preview {
+  height: 80px;
+  display: flex;
+}
+
+.pc { flex: 1; }
+
+.palette-label {
+  padding: 12px 14px;
+  background: var(--bg2);
+  font-family: 'DM Mono', monospace;
+  font-size: 11px;
+  color: var(--dim);
+}
+
+/* ---- footer ---- */
+footer {
+  border-top: 1px solid var(--line);
+  padding: 48px 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.footer-logo {
+  font-family: 'Fraunces', serif;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--bright);
+}
+
+.footer-logo span { color: var(--accent2); }
+
+.footer-links {
+  display: flex;
+  gap: 28px;
+  list-style: none;
+}
+
+.footer-links a {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-links a:hover { color: var(--fg); }
+
+.footer-right {
+  font-family: 'DM Mono', monospace;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+/* ---- animations ---- */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(24px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.hero-tag    { animation: fadeUp 0.5s ease 0.1s both; }
+.hero-inner h1  { animation: fadeUp 0.5s ease 0.2s both; }
+.hero-sub    { animation: fadeUp 0.5s ease 0.3s both; }
+.hero-actions{ animation: fadeUp 0.5s ease 0.4s both; }
+.os-note     { animation: fadeUp 0.5s ease 0.5s both; }
+.hero-code   { animation: fadeUp 0.6s ease 0.35s both; }
+
+/* ---- responsiveness ---- */
+@media (max-width: 1000px) {
+  .hero { flex-direction: column; }
+  .hero-code { position: static; width: 100%; max-width: 100%; margin-top: 48px; transform: none; }
+  .features-grid { grid-template-columns: 1fr 1fr; }
+  .steps { grid-template-columns: 1fr; gap: 32px; }
+  .widget-list { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 640px) {
+  nav { padding: 16px 24px; }
+  .nav-links { display: none; }
+  section, .hero { padding: 80px 24px; }
+  .features-grid { grid-template-columns: 1fr; }
+  .widget-list { grid-template-columns: 1fr; }
+  .install-strip { flex-direction: column; align-items: flex-start; }
+  footer { flex-direction: column; gap: 24px; text-align: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">Pro<span>ton</span></div>
+  <ul class="nav-links">
+    <li><a href="#features">Features</a></li>
+    <li><a href="#how">How it works</a></li>
+    <li><a href="#widgets">Widgets</a></li>
+    <li><a href="#download">Download</a></li>
+    <li><a href="https://github.com/CzaxStudio/proton">GitHub</a></li>
+  </ul>
+  <a href="#download" class="nav-cta">Download</a>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-inner">
+    <div class="hero-tag">v1.0 — Pure Go, no C deps</div>
+    <h1>GUI for Go.<br><em>Finally.</em></h1>
+    <p class="hero-sub">
+      Proton is a desktop GUI library that doesn't make you write XML,
+      install CGo toolchains, or question your career choices.
+      Pure Go. Built on Gio.
+    </p>
+    <div class="hero-actions">
+      <a id="hero-dl" href="#download" class="btn-primary">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Download for your OS
+      </a>
+      <a href="https://github.com/CzaxStudio/proton" class="btn-secondary">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 00-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0020 4.77 5.07 5.07 0 0019.91 1S18.73.65 16 2.48a13.38 13.38 0 00-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 005 4.77a5.44 5.44 0 00-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 009 18.13V22"/></svg>
+        View on GitHub
+      </a>
+    </div>
+    <p class="os-note" id="os-note">Detecting your OS...</p>
+  </div>
+
+  <div class="hero-code">
+    <div class="code-window">
+      <div class="code-titlebar">
+        <div class="dot red"></div>
+        <div class="dot yellow"></div>
+        <div class="dot green"></div>
+        <span class="code-filename">main.go</span>
+      </div>
+      <div class="code-body">
+        <div><span class="ln">1</span><span class="pk">package</span> <span class="ty">main</span></div>
+        <div><span class="ln">2</span></div>
+        <div><span class="ln">3</span><span class="pk">import</span> <span class="st">"github.com/CzaxStudio/proton"</span></div>
+        <div><span class="ln">4</span></div>
+        <div><span class="ln">5</span><span class="kw">type</span> <span class="ty">UI</span> <span class="kw">struct</span> {</div>
+        <div><span class="ln">6</span>&nbsp;&nbsp;&nbsp;&nbsp;name  <span class="ty">proton.Editor</span></div>
+        <div><span class="ln">7</span>&nbsp;&nbsp;&nbsp;&nbsp;btn   <span class="ty">proton.Clickable</span></div>
+        <div><span class="ln">8</span>}</div>
+        <div><span class="ln">9</span></div>
+        <div><span class="ln">10</span><span class="kw">func</span> <span class="fn">main</span>() {</div>
+        <div><span class="ln">11</span>&nbsp;&nbsp;&nbsp;&nbsp;u := &amp;<span class="ty">UI</span>{}</div>
+        <div><span class="ln">12</span>&nbsp;&nbsp;&nbsp;&nbsp;a := <span class="fn">proton.New</span>(<span class="st">"my app"</span>)</div>
+        <div><span class="ln">13</span>&nbsp;&nbsp;&nbsp;&nbsp;a.<span class="fn">ApplyPalette</span>(<span class="ty">proton.NordPalette</span>)</div>
+        <div><span class="ln">14</span>&nbsp;&nbsp;&nbsp;&nbsp;a.<span class="fn">Window</span>(<span class="st">"Hello"</span>, <span class="fn">480</span>, <span class="fn">300</span>, <span class="kw">func</span>(win *<span class="ty">proton.Win</span>) {</div>
+        <div><span class="ln">15</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">proton.H3</span>(win, <span class="st">"Hello from Proton!"</span>)</div>
+        <div><span class="ln">16</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">proton.Gap</span>(win, <span class="fn">8</span>)</div>
+        <div><span class="ln">17</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">proton.Input</span>(win, &amp;u.name, <span class="st">"Your name"</span>)</div>
+        <div><span class="ln">18</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">proton.Gap</span>(win, <span class="fn">8</span>)</div>
+        <div><span class="ln">19</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="kw">if</span> <span class="fn">proton.Button</span>(win, &amp;u.btn, <span class="st">"Go"</span>) {</div>
+        <div><span class="ln">20</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span class="fn">println</span>(<span class="st">"Hello,"</span>, u.name.<span class="fn">Text</span>())</div>
+        <div><span class="ln">21</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;}</div>
+        <div><span class="ln">22</span>&nbsp;&nbsp;&nbsp;&nbsp;})</div>
+        <div><span class="ln">23</span>&nbsp;&nbsp;&nbsp;&nbsp;a.<span class="fn">Run</span>()</div>
+        <div><span class="ln">24</span>}</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- INSTALL STRIP -->
+<div class="install-strip">
+  <span class="install-label">INSTALL</span>
+  <span class="install-cmd">go get github.com/CzaxStudio/proton</span>
+  <button class="copy-btn" onclick="copyInstall(this)">Copy</button>
+</div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="section-label">Why Proton</div>
+  <h2>Built for Go developers<br>who value their time</h2>
+  <p class="section-desc">No CGo. No XML. No component lifecycles. Just Go functions that draw things on screen.</p>
+
+  <div class="features-grid">
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+      </div>
+      <h3>Pure Go</h3>
+      <p>No C dependencies. No CGo toolchain. Works with a vanilla <code style="font-family:DM Mono,monospace;font-size:12px;background:var(--bg3);border:1px solid var(--line);padding:2px 6px;border-radius:3px;color:var(--accent2)">go build</code> on every platform.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+      </div>
+      <h3>Cross-platform</h3>
+      <p>Linux, macOS, and Windows. One codebase, three platforms. The dream is real.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      </div>
+      <h3>Immediate mode</h3>
+      <p>Your draw function runs every frame. No state syncing, no virtual DOM, no diffing algorithm to debug at 2am.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.07 4.93a10 10 0 010 14.14M4.93 4.93a10 10 0 000 14.14"/></svg>
+      </div>
+      <h3>Simple theming</h3>
+      <p>Four colors. One function call. Built-in palettes for Nord, Catppuccin, Rose Pine, and more.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+      </div>
+      <h3>One import</h3>
+      <p>State types re-exported. Layout helpers included. You only ever need to import <code style="font-family:DM Mono,monospace;font-size:12px;background:var(--bg3);border:1px solid var(--line);padding:2px 6px;border-radius:3px;color:var(--accent2)">proton</code>.</p>
+    </div>
+    <div class="feature">
+      <div class="feature-icon">
+        <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
+      <h3>Real layouts</h3>
+      <p>Row, Column, Split, Grid, GrowRow. Everything you need to build a real UI without fighting the framework.</p>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- HOW IT WORKS -->
+<div id="how">
+  <div class="inner">
+    <div class="section-label">How it works</div>
+    <h2>Three steps to a running app</h2>
+    <p class="section-desc">No boilerplate ceremony. No project scaffolding. Just code.</p>
+
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">01</div>
+        <h3>Define your state</h3>
+        <p>Put all widget state in a plain Go struct. One <code>proton.Clickable</code> per button, one <code>proton.Editor</code> per text field. No special types, no reactive wrappers.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <h3>Write your draw function</h3>
+        <p>Call widget functions in order — they appear on screen in that order, stacked vertically by default. Use <code>Row</code>, <code>Split</code>, and <code>Pad</code> to arrange them differently.</p>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <h3>Call a.Run()</h3>
+        <p>That's it. The event loop runs, your draw function fires every frame, and Gio handles rendering, input, and OS integration. You handle the logic.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<hr class="rule">
+
+<!-- WIDGETS -->
+<section id="widgets">
+  <div class="section-label">Widget library</div>
+  <h2>Everything you need.<br>Nothing you don't.</h2>
+  <p class="section-desc">28 widgets covering every common UI pattern. Stateful ones return values — no callbacks, no event handlers.</p>
+
+  <div class="widget-list">
+    <div class="widget-item"><div class="widget-name">Label</div><div class="widget-desc">Body text</div></div>
+    <div class="widget-item"><div class="widget-name">H1 – H6</div><div class="widget-desc">Heading sizes</div></div>
+    <div class="widget-item"><div class="widget-name">Text</div><div class="widget-desc">Custom size, color, weight</div></div>
+    <div class="widget-item"><div class="widget-name">Caption</div><div class="widget-desc">Small annotation text</div></div>
+    <div class="widget-item"><div class="widget-name">Button</div><div class="widget-desc">Filled — returns bool</div></div>
+    <div class="widget-item"><div class="widget-name">OutlineButton</div><div class="widget-desc">Ghost style — returns bool</div></div>
+    <div class="widget-item"><div class="widget-name">IconButton</div><div class="widget-desc">Icon only — returns bool</div></div>
+    <div class="widget-item"><div class="widget-name">Tappable</div><div class="widget-desc">Any content as clickable</div></div>
+    <div class="widget-item"><div class="widget-name">Input</div><div class="widget-desc">Single-line text field</div></div>
+    <div class="widget-item"><div class="widget-name">TextArea</div><div class="widget-desc">Multi-line text field</div></div>
+    <div class="widget-item"><div class="widget-name">Checkbox</div><div class="widget-desc">Returns true on change</div></div>
+    <div class="widget-item"><div class="widget-name">Toggle</div><div class="widget-desc">On/off switch</div></div>
+    <div class="widget-item"><div class="widget-name">RadioButton</div><div class="widget-desc">Shared Enum state</div></div>
+    <div class="widget-item"><div class="widget-name">Slider</div><div class="widget-desc">Returns 0.0 – 1.0</div></div>
+    <div class="widget-item"><div class="widget-name">ProgressBar</div><div class="widget-desc">0.0 – 1.0 fill</div></div>
+    <div class="widget-item"><div class="widget-name">List</div><div class="widget-desc">Virtual scrolling list</div></div>
+    <div class="widget-item"><div class="widget-name">HList</div><div class="widget-desc">Horizontal list</div></div>
+    <div class="widget-item"><div class="widget-name">Scroll</div><div class="widget-desc">Scrollable area</div></div>
+    <div class="widget-item"><div class="widget-name">Divider</div><div class="widget-desc">Horizontal rule</div></div>
+    <div class="widget-item"><div class="widget-name">Rect</div><div class="widget-desc">Filled rectangle</div></div>
+    <div class="widget-item"><div class="widget-name">RoundRect</div><div class="widget-desc">Rounded rectangle</div></div>
+    <div class="widget-item"><div class="widget-name">Card</div><div class="widget-desc">Content in a background box</div></div>
+    <div class="widget-item"><div class="widget-name">Badge</div><div class="widget-desc">Colored chip / tag</div></div>
+    <div class="widget-item"><div class="widget-name">Image</div><div class="widget-desc">PNG and JPEG</div></div>
+    <div class="widget-item"><div class="widget-name">Tooltip</div><div class="widget-desc">Hover label</div></div>
+    <div class="widget-item"><div class="widget-name">Toast</div><div class="widget-desc">Timed notification</div></div>
+    <div class="widget-item"><div class="widget-name">MinSize</div><div class="widget-desc">Minimum size constraint</div></div>
+    <div class="widget-item"><div class="widget-name">MaxWidth</div><div class="widget-desc">Maximum width constraint</div></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- PALETTES -->
+<section>
+  <div class="section-label">Theming</div>
+  <h2>Four colors.<br>One function call.</h2>
+  <p class="section-desc">Built-in palettes or roll your own. The entire app updates at once — no hunting through component stylesheets.</p>
+
+  <div class="palette-row">
+    <div class="palette-card">
+      <div class="palette-preview">
+        <div class="pc" style="background:#18191f"></div>
+        <div class="pc" style="background:#dcdce8"></div>
+        <div class="pc" style="background:#7c6af7"></div>
+        <div class="pc" style="background:#fff"></div>
+      </div>
+      <div class="palette-label">DarkPalette</div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-preview">
+        <div class="pc" style="background:#2e3440"></div>
+        <div class="pc" style="background:#d8dee9"></div>
+        <div class="pc" style="background:#88c0d0"></div>
+        <div class="pc" style="background:#2e3440"></div>
+      </div>
+      <div class="palette-label">NordPalette</div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-preview">
+        <div class="pc" style="background:#191724"></div>
+        <div class="pc" style="background:#e0def4"></div>
+        <div class="pc" style="background:#c4a7e7"></div>
+        <div class="pc" style="background:#191724"></div>
+      </div>
+      <div class="palette-label">RosePinePalette</div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-preview">
+        <div class="pc" style="background:#1e1e2e"></div>
+        <div class="pc" style="background:#cdd6f4"></div>
+        <div class="pc" style="background:#89b4fa"></div>
+        <div class="pc" style="background:#1e1e2e"></div>
+      </div>
+      <div class="palette-label">CatppuccinPalette</div>
+    </div>
+    <div class="palette-card">
+      <div class="palette-preview">
+        <div class="pc" style="background:#000"></div>
+        <div class="pc" style="background:#00ff00"></div>
+        <div class="pc" style="background:#008f11"></div>
+        <div class="pc" style="background:#000"></div>
+      </div>
+      <div class="palette-label">Custom (Hacker)</div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- DOWNLOAD -->
+<section id="download">
+  <div class="download-glow"></div>
+  <div class="section-label" style="text-align:center">Download</div>
+  <h2>Get Proton</h2>
+  <p class="download-sub">Free. Open source. MIT license.</p>
+
+  <div class="download-cards">
+    <a class="dl-card win" href="https://github.com/CzaxStudio/proton/releases/tag/Windows">
+      <div class="dl-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <rect x="2" y="2" width="9" height="9" rx="1"/>
+          <rect x="13" y="2" width="9" height="9" rx="1"/>
+          <rect x="2" y="13" width="9" height="9" rx="1"/>
+          <rect x="13" y="13" width="9" height="9" rx="1"/>
+        </svg>
+      </div>
+      <div class="dl-os">Windows</div>
+      <div class="dl-sub">x86 / x64</div>
+    </a>
+
+    <a class="dl-card mac" href="https://github.com/CzaxStudio/proton/releases/tag/Mac(Intel)">
+      <div class="dl-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+        </svg>
+      </div>
+      <div class="dl-os">macOS</div>
+      <div class="dl-sub">Intel</div>
+    </a>
+
+    <a class="dl-card linux" href="https://github.com/CzaxStudio/proton/releases/tag/Linux">
+      <div class="dl-icon">
+        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.5 2C9 2 7 5 7 5S3.5 5 3.5 9c0 2.5 1.5 4 1.5 4l-1 6s.5 1 2 1c0 0 1-2 2-2h8c1 0 2 2 2 2 1.5 0 2-1 2-1l-1-6s1.5-1.5 1.5-4C20.5 5 17 5 17 5S15 2 12.5 2z"/>
+          <circle cx="9.5" cy="10" r="1"/>
+          <circle cx="14.5" cy="10" r="1"/>
+          <path d="M10 14s.5 1.5 2 1.5S14 14 14 14"/>
+        </svg>
+      </div>
+      <div class="dl-os">Linux</div>
+      <div class="dl-sub">amd64</div>
+    </a>
+  </div>
+
+  <div class="dl-auto">
+    <button id="auto-dl-btn" onclick="autoDownload()">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download for my OS
+    </button>
+    <span id="detected-os">Detecting...</span>
+  </div>
+
+  <div style="margin-top:64px;text-align:left;max-width:600px;margin-left:auto;margin-right:auto">
+    <div class="section-label" style="margin-bottom:12px">Or install via Go</div>
+    <div style="background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:20px 24px;font-family:'DM Mono',monospace;font-size:14px;color:var(--green)">
+      go get github.com/CzaxStudio/proton
+    </div>
+    <p style="margin-top:12px;font-size:13px;color:var(--muted);font-family:'DM Mono',monospace">
+      Linux also needs: apt install libwayland-dev libxkbcommon-dev libvulkan-dev
+    </p>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">Pro<span>ton</span></div>
+  <ul class="footer-links">
+    <li><a href="https://github.com/CzaxStudio/proton">GitHub</a></li>
+    <li><a href="https://github.com/CzaxStudio/proton-documentation">Docs</a></li>
+    <li><a href="https://github.com/CzaxStudio/proton/tree/main/examples">Examples</a></li>
+    <li><a href="https://github.com/CzaxStudio/proton/issues">Issues</a></li>
+  </ul>
+  <div class="footer-right">MIT License — CzaxStudio</div>
+</footer>
+
+<script>
+// OS detection
+function detectOS() {
+  const ua = navigator.userAgent.toLowerCase();
+  const platform = navigator.platform ? navigator.platform.toLowerCase() : '';
+  if (platform.includes('win') || ua.includes('windows')) return 'windows';
+  if (platform.includes('mac') || ua.includes('macintosh') || ua.includes('mac os')) return 'mac';
+  if (platform.includes('linux') || ua.includes('linux')) return 'linux';
+  return 'unknown';
+}
+
+const links = {
+  windows: 'https://github.com/CzaxStudio/proton/releases/tag/Windows',
+  mac:     'https://github.com/CzaxStudio/proton/releases/tag/Mac(Intel)',
+  linux:   'https://github.com/CzaxStudio/proton/releases/tag/Linux',
+};
+
+const osNames = {
+  windows: 'Windows',
+  mac:     'macOS (Intel)',
+  linux:   'Linux',
+};
+
+function autoDownload() {
+  const os = detectOS();
+  const url = links[os] || links.linux;
+  window.open(url, '_blank');
+}
+
+function updateOSUI() {
+  const os = detectOS();
+  const name = osNames[os] || 'your OS';
+  const url  = links[os]  || links.linux;
+
+  const noteEl = document.getElementById('os-note');
+  const btnEl  = document.getElementById('auto-dl-btn');
+  const detectedEl = document.getElementById('detected-os');
+  const heroBtn = document.getElementById('hero-dl');
+
+  if (noteEl)     noteEl.textContent = 'Detected: ' + name;
+  if (detectedEl) detectedEl.textContent = 'Detected: ' + name;
+  if (btnEl)      btnEl.querySelector('svg').nextSibling.textContent = ' Download for ' + name;
+  if (heroBtn)    heroBtn.href = url;
+}
+
+updateOSUI();
+
+// Copy install command
+function copyInstall(btn) {
+  navigator.clipboard.writeText('go get github.com/CzaxStudio/proton').then(() => {
+    const orig = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(() => btn.textContent = orig, 1800);
+  });
+}
+
+// Subtle scroll fade-in for sections
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.style.opacity = '1';
+      e.target.style.transform = 'translateY(0)';
+    }
+  });
+}, { threshold: 0.1 });
+
+document.querySelectorAll('section, #how .inner, .install-strip').forEach(el => {
+  el.style.opacity = '0';
+  el.style.transform = 'translateY(20px)';
+  el.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+  observer.observe(el);
+});
+</script>
+</body>
+</html>
