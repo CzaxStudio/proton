@@ -312,3 +312,162 @@ func ThemePicker(win *Win, state *ThemePickerState, a *App) {
 		}
 	})
 }
+
+// ----- color code API -----
+
+// Theme is a chainable builder for custom palettes using CSS hex color codes.
+// Get one from a.Theme(), set the colors you want, then call Apply().
+//
+//	a.Theme().
+//	    Bg("#1e1e2e").
+//	    Fg("#cdd6f4").
+//	    Primary("#89b4fa").
+//	    PrimaryFg("#1e1e2e").
+//	    Apply()
+//
+// Or use ColorCode to patch a single slot on an existing palette:
+//
+//	a.ApplyPalette(proton.NordPalette)
+//	a.Theme().Primary("#ff6b6b").Apply()  // override just the primary color
+type ThemeBuilder struct {
+	app *App
+	p   Palette
+}
+
+// ThemeBuilder returns a builder pre-loaded with the current palette colors.
+func (a *App) ThemeBuilder() *ThemeBuilder {
+	return &ThemeBuilder{
+		app: a,
+		p: Palette{
+			Bg:        a.theme.Palette.Bg,
+			Fg:        a.theme.Palette.Fg,
+			Primary:   a.theme.Palette.ContrastBg,
+			PrimaryFg: a.theme.Palette.ContrastFg,
+		},
+	}
+}
+
+// ColorCode parses a CSS hex color string and sets the background color.
+// Accepts "#rrggbb", "#rgb", "rrggbb", or "rgb" — with or without the #.
+// This is the main entry point for the hex color code API.
+//
+// Which slot to set is determined by the method you chain it from:
+//
+//	a.Theme().Bg("#1e1e2e").Fg("#cdd6f4").Primary("#89b4fa").Apply()
+//
+// Or if you want to patch just one color on the current theme:
+//
+//	a.Theme().Primary("#ff0000").Apply()
+func (a *App) ColorCode(slot, code string) {
+	b := a.ThemeBuilder()
+	c := parseHex(code)
+	switch slot {
+	case "bg", "background":
+		b.p.Bg = c
+	case "fg", "foreground", "text":
+		b.p.Fg = c
+	case "primary", "accent":
+		b.p.Primary = c
+	case "primaryfg", "primarytext":
+		b.p.PrimaryFg = c
+	}
+	b.Apply()
+}
+
+// Bg sets the background color from a hex code string.
+// Accepts "#rrggbb", "rrggbb", "#rgb", or "rgb".
+func (tb *ThemeBuilder) Bg(code string) *ThemeBuilder {
+	tb.p.Bg = parseHex(code)
+	return tb
+}
+
+// Fg sets the foreground (text) color from a hex code string.
+func (tb *ThemeBuilder) Fg(code string) *ThemeBuilder {
+	tb.p.Fg = parseHex(code)
+	return tb
+}
+
+// Primary sets the accent/button color from a hex code string.
+func (tb *ThemeBuilder) Primary(code string) *ThemeBuilder {
+	tb.p.Primary = parseHex(code)
+	return tb
+}
+
+// PrimaryFg sets the text-on-primary color from a hex code string.
+func (tb *ThemeBuilder) PrimaryFg(code string) *ThemeBuilder {
+	tb.p.PrimaryFg = parseHex(code)
+	return tb
+}
+
+// Apply pushes the built palette into the app.
+func (tb *ThemeBuilder) Apply() {
+	tb.app.ApplyPalette(tb.p)
+}
+
+// Palette returns the built Palette without applying it.
+// Useful if you want to store it and apply it later.
+func (tb *ThemeBuilder) Palette() Palette {
+	return tb.p
+}
+
+// parseHex converts a CSS hex color string to color.NRGBA.
+// Handles "#rrggbb", "rrggbb", "#rgb", "rgb", "#rrggbbaa", "rrggbbaa".
+// Returns transparent black on invalid input rather than panicking.
+func parseHex(s string) color.NRGBA {
+	// strip leading #
+	if len(s) > 0 && s[0] == '#' {
+		s = s[1:]
+	}
+
+	switch len(s) {
+	case 3: // rgb shorthand — expand to rrggbb
+		s = string([]byte{s[0], s[0], s[1], s[1], s[2], s[2]})
+		fallthrough
+	case 6: // rrggbb
+		v, ok := hexToUint32(s)
+		if !ok {
+			return color.NRGBA{}
+		}
+		return color.NRGBA{
+			R: uint8(v >> 16),
+			G: uint8(v >> 8),
+			B: uint8(v),
+			A: 0xff,
+		}
+	case 4: // rgba shorthand
+		s = string([]byte{s[0], s[0], s[1], s[1], s[2], s[2], s[3], s[3]})
+		fallthrough
+	case 8: // rrggbbaa
+		v, ok := hexToUint32(s[:6])
+		a, aok := hexToUint32("00" + s[6:8])
+		if !ok || !aok {
+			return color.NRGBA{}
+		}
+		return color.NRGBA{
+			R: uint8(v >> 16),
+			G: uint8(v >> 8),
+			B: uint8(v),
+			A: uint8(a),
+		}
+	}
+	return color.NRGBA{}
+}
+
+// hexToUint32 converts up to 8 hex chars to a uint32.
+func hexToUint32(s string) (uint32, bool) {
+	var v uint32
+	for _, c := range s {
+		v <<= 4
+		switch {
+		case c >= '0' && c <= '9':
+			v |= uint32(c - '0')
+		case c >= 'a' && c <= 'f':
+			v |= uint32(c-'a') + 10
+		case c >= 'A' && c <= 'F':
+			v |= uint32(c-'A') + 10
+		default:
+			return 0, false
+		}
+	}
+	return v, true
+}
