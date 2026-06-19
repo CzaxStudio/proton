@@ -2,6 +2,9 @@
 
 A GUI library for Go that doesn't make you want to switch to web dev.
 
+### Currently under development for v0.2.5
+### It is highly unlikely that we will change the API. Just add more features to the Proton API.
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
 ## Our First Stargazers
