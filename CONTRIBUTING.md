@@ -4,6 +4,16 @@ Thank you for your interest in contributing to Proton! We welcome bug reports, f
 
 ---
 
+## Want to contribute?
+
+We are open to accept contributers. If you want to become a contributer, open a pull request and after reviewing your GitHub projects, we will decide.
+
+Things you must have
+
+* At least one good GitHub repo
+* You must be a Go developer
+* Good knowledge about GUI toolkits(Gio, specially)
+
 ## Getting Started & Prerequisites
 
 Because Proton interacts directly with system graphics, you need to ensure your local development environment has the necessary dependencies installed before compiling.
