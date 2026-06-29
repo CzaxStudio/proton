@@ -28,7 +28,7 @@ type ResizeSplitState struct {
 //	    func(win *proton.Win) { drawSidebar(win) },
 //	    func(win *proton.Win) { drawContent(win) },
 //	)
-func ResizeSplit(win *Win, state *ResizeSplitState, defaultFraction float32, left, right func(*Win)) {
+func ResizeSplit(win Context, state *ResizeSplitState, defaultFraction float32, left, right func(Context)) {
 	if state.Fraction == 0 {
 		state.Fraction = defaultFraction
 	}
@@ -85,10 +85,10 @@ func ResizeSplit(win *Win, state *ResizeSplitState, defaultFraction float32, lef
 				event.Op(gtx.Ops, &state.tag)
 				area.Pop()
 
-				c := win.th.Palette.Fg
+				c := win.theme().Palette.Fg
 				c.A = 50
 				if state.dragging {
-					c = win.th.Palette.ContrastBg
+					c = win.theme().Palette.ContrastBg
 					c.A = 180
 				}
 				lineW := gtx.Dp(unit.Dp(1))
@@ -110,7 +110,7 @@ func ResizeSplit(win *Win, state *ResizeSplitState, defaultFraction float32, lef
 
 // ResizeHSplit is the vertical version of ResizeSplit — top and bottom panes
 // with a draggable horizontal divider.
-func ResizeHSplit(win *Win, state *ResizeSplitState, defaultFraction float32, top, bottom func(*Win)) {
+func ResizeHSplit(win Context, state *ResizeSplitState, defaultFraction float32, top, bottom func(Context)) {
 	if state.Fraction == 0 {
 		state.Fraction = defaultFraction
 	}
@@ -165,10 +165,10 @@ func ResizeHSplit(win *Win, state *ResizeSplitState, defaultFraction float32, to
 				event.Op(gtx.Ops, &state.tag)
 				area.Pop()
 
-				c := win.th.Palette.Fg
+				c := win.theme().Palette.Fg
 				c.A = 50
 				if state.dragging {
-					c = win.th.Palette.ContrastBg
+					c = win.theme().Palette.ContrastBg
 					c.A = 180
 				}
 				lineH := gtx.Dp(unit.Dp(1))

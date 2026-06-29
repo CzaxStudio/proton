@@ -19,14 +19,14 @@ import (
 //	    func(win *proton.Win) { proton.Gap(win, 8) },
 //	    func(win *proton.Win) { proton.ShortcutHint(win, "Ctrl+S") },
 //	)
-func ShortcutHint(win *Win, keys string) {
+func ShortcutHint(win Context, keys string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		bg := win.th.Palette.Fg
+		bg := win.theme().Palette.Fg
 		bg.A = 22
-		border := win.th.Palette.Fg
+		border := win.theme().Palette.Fg
 		border.A = 50
 
-		lbl := material.Caption(win.th, keys)
+		lbl := material.Caption(win.theme(), keys)
 		lbl.Color.A = 160
 
 		return layout.Stack{}.Layout(gtx,
@@ -62,7 +62,7 @@ func ShortcutHint(win *Win, keys string) {
 //
 //	i := proton.ColorSwatch(win, swatches[:], palette, selectedColor, 28)
 //	if i >= 0 { selectedColor = i }
-func ColorSwatch(win *Win, btns []Clickable, colors []color.NRGBA, selected int, sizeDp float32) int {
+func ColorSwatch(win Context, btns []Clickable, colors []color.NRGBA, selected int, sizeDp float32) int {
 	result := selected
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		sz := gtx.Dp(unit.Dp(sizeDp))
@@ -89,7 +89,7 @@ func ColorSwatch(win *Win, btns []Clickable, colors []color.NRGBA, selected int,
 					inner := sz / 2
 
 					if i == result {
-						ring := win.th.Palette.Fg
+						ring := win.theme().Palette.Fg
 						ring.A = 200
 						paint.FillShape(gtx.Ops, ring,
 							clip.Ellipse{
@@ -129,7 +129,7 @@ func ColorSwatch(win *Win, btns []Clickable, colors []color.NRGBA, selected int,
 //	    func(win *proton.Win) { proton.Gap(win, 6) },
 //	    func(win *proton.Win) { proton.Caption(win, "Connected") },
 //	)
-func StatusDot(win *Win, c color.NRGBA, sizeDp float32) {
+func StatusDot(win Context, c color.NRGBA, sizeDp float32) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		sz := gtx.Dp(unit.Dp(sizeDp))
 		r := sz / 2

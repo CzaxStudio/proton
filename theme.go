@@ -274,30 +274,30 @@ type ThemePickerState struct {
 // Place it in a settings panel or a dedicated theme window.
 //
 //	proton.ThemePicker(win, &u.picker, a)
-func ThemePicker(win *Win, state *ThemePickerState, a *App) {
+func ThemePicker(win Context, state *ThemePickerState, a *App) {
 	for len(state.btns) < len(AllPalettes) {
 		state.btns = append(state.btns, Clickable{})
 	}
 
-	List(win, &state.scroll, len(AllPalettes), func(win *Win, i int) {
+	List(win, &state.scroll, len(AllPalettes), func(win Context, i int) {
 		p := AllPalettes[i]
-		if Tappable(win, &state.btns[i], func(win *Win) {
-			PadV(win, 6, func(win *Win) {
+		if Tappable(win, &state.btns[i], func(win Context) {
+			PadV(win, 6, func(win Context) {
 				Row(win,
-					func(win *Win) {
+					func(win Context) {
 						// four color swatches
 						Row(win,
-							func(win *Win) { Rect(win, p.Palette.Bg, 14, 14) },
-							func(win *Win) { Gap(win, 2) },
-							func(win *Win) { Rect(win, p.Palette.Fg, 14, 14) },
-							func(win *Win) { Gap(win, 2) },
-							func(win *Win) { Rect(win, p.Palette.Primary, 14, 14) },
-							func(win *Win) { Gap(win, 2) },
-							func(win *Win) { Rect(win, p.Palette.PrimaryFg, 14, 14) },
+							func(win Context) { Rect(win, p.Palette.Bg, 14, 14) },
+							func(win Context) { Gap(win, 2) },
+							func(win Context) { Rect(win, p.Palette.Fg, 14, 14) },
+							func(win Context) { Gap(win, 2) },
+							func(win Context) { Rect(win, p.Palette.Primary, 14, 14) },
+							func(win Context) { Gap(win, 2) },
+							func(win Context) { Rect(win, p.Palette.PrimaryFg, 14, 14) },
 						)
 					},
-					func(win *Win) { Gap(win, 10) },
-					func(win *Win) {
+					func(win Context) { Gap(win, 10) },
+					func(win Context) {
 						label := p.Name
 						if i == state.selected {
 							label = "• " + label
@@ -316,9 +316,9 @@ func ThemePicker(win *Win, state *ThemePickerState, a *App) {
 // ----- color code API -----
 
 // Theme is a chainable builder for custom palettes using CSS hex color codes.
-// Get one from a.Theme(), set the colors you want, then call Apply().
+// Get one from a.ThemeBuilder(), set the colors you want, then call Apply().
 //
-//	a.Theme().
+//	a.ThemeBuilder().
 //	    Bg("#1e1e2e").
 //	    Fg("#cdd6f4").
 //	    Primary("#89b4fa").
@@ -328,7 +328,7 @@ func ThemePicker(win *Win, state *ThemePickerState, a *App) {
 // Or use ColorCode to patch a single slot on an existing palette:
 //
 //	a.ApplyPalette(proton.NordPalette)
-//	a.Theme().Primary("#ff6b6b").Apply()  // override just the primary color
+//	a.ThemeBuilder().Primary("#ff6b6b").Apply()  // override just the primary color
 type ThemeBuilder struct {
 	app *App
 	p   Palette
@@ -353,11 +353,11 @@ func (a *App) ThemeBuilder() *ThemeBuilder {
 //
 // Which slot to set is determined by the method you chain it from:
 //
-//	a.Theme().Bg("#1e1e2e").Fg("#cdd6f4").Primary("#89b4fa").Apply()
+//	a.ThemeBuilder().Bg("#1e1e2e").Fg("#cdd6f4").Primary("#89b4fa").Apply()
 //
 // Or if you want to patch just one color on the current theme:
 //
-//	a.Theme().Primary("#ff0000").Apply()
+//	a.ThemeBuilder().Primary("#ff0000").Apply()
 func (a *App) ColorCode(slot, code string) {
 	b := a.ThemeBuilder()
 	c := parseHex(code)

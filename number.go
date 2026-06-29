@@ -27,7 +27,7 @@ type NumberState struct {
 // Returns the current value.
 //
 //	qty := proton.NumberInput(win, &u.qty, 1, 99, 1)
-func NumberInput(win *Win, state *NumberState, min, max, step float64) float64 {
+func NumberInput(win Context, state *NumberState, min, max, step float64) float64 {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		if state.dec.Clicked(gtx) {
 			state.Value = math.Max(min, state.Value-step)
@@ -45,15 +45,15 @@ func NumberInput(win *Win, state *NumberState, min, max, step float64) float64 {
 		return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints = layout.Exact(btnSz)
-				return material.Button(win.th, &state.dec, "−").Layout(gtx)
+				return material.Button(win.theme(), &state.dec, "−").Layout(gtx)
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints = layout.Exact(numSz)
-				return layout.Center.Layout(gtx, material.Body1(win.th, numFmt(state.Value, step)).Layout)
+				return layout.Center.Layout(gtx, material.Body1(win.theme(), numFmt(state.Value, step)).Layout)
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				gtx.Constraints = layout.Exact(btnSz)
-				return material.Button(win.th, &state.inc, "+").Layout(gtx)
+				return material.Button(win.theme(), &state.inc, "+").Layout(gtx)
 			}),
 		)
 	})

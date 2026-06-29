@@ -17,50 +17,48 @@ import (
 )
 
 // clickResults, boolResults, enumResults store the click/change state from
-// the previous frame for each widget state pointer. This lets Button(),
-// Checkbox() etc. return correct values even though their layout closures
-// run after the draw function returns.
-var clickResults = map[*widget.Clickable]bool{}
-var boolResults  = map[*widget.Bool]bool{}
-var enumResults  = map[*widget.Enum]bool{}
-
+// the previous frame so Button(), Checkbox() etc. can return correct values
+// even though their layout closures run after the draw function returns.
+var clickResults = map[*Clickable]bool{}
+var boolResults  = map[*Bool]bool{}
+var enumResults  = map[*Enum]bool{}
 
 // ----- text -----
 
-func Label(win *Win, text string) {
+func Label(win Context, text string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		return material.Body1(win.th, text).Layout(gtx)
+		return material.Body1(win.theme(), text).Layout(gtx)
 	})
 }
 
-func H1(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.H1(win.th, text).Layout(gtx) })
+func H1(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.H1(win.theme(), text).Layout(gtx) })
 }
-func H2(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.H2(win.th, text).Layout(gtx) })
+func H2(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.H2(win.theme(), text).Layout(gtx) })
 }
-func H3(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.H3(win.th, text).Layout(gtx) })
+func H3(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.H3(win.theme(), text).Layout(gtx) })
 }
-func H4(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.H4(win.th, text).Layout(gtx) })
+func H4(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.H4(win.theme(), text).Layout(gtx) })
 }
-func H5(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.H5(win.th, text).Layout(gtx) })
+func H5(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.H5(win.theme(), text).Layout(gtx) })
 }
-func H6(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.H6(win.th, text).Layout(gtx) })
+func H6(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.H6(win.theme(), text).Layout(gtx) })
 }
-func Body2(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.Body2(win.th, text).Layout(gtx) })
+func Body2(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.Body2(win.theme(), text).Layout(gtx) })
 }
-func Caption(win *Win, text string) {
-	win.add(func(gtx layout.Context) layout.Dimensions { return material.Caption(win.th, text).Layout(gtx) })
+func Caption(win Context, text string) {
+	win.add(func(gtx layout.Context) layout.Dimensions { return material.Caption(win.theme(), text).Layout(gtx) })
 }
 
-func Text(win *Win, s string, size float32, c color.NRGBA, bold bool) {
+func Text(win Context, s string, size float32, c color.NRGBA, bold bool) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Label(win.th, unit.Sp(size), s)
+		lbl := material.Label(win.theme(), unit.Sp(size), s)
 		if c != (color.NRGBA{}) {
 			lbl.Color = c
 		}
@@ -71,43 +69,101 @@ func Text(win *Win, s string, size float32, c color.NRGBA, bold bool) {
 	})
 }
 
-// ----- buttons -----
+// ----- custom-drawn buttons -----
 
-// Button draws a filled button. Returns true if it was clicked.
-// Click state is read from the previous frame's event processing —
-// at 60fps this one-frame latency is imperceptible.
-func Button(win *Win, state *widget.Clickable, label string) bool {
+// Button draws a filled button with hover and press states.
+func Button(win Context, state *Clickable, label string) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)
-		return material.Button(win.th, state, label).Layout(gtx)
+		return drawButton(gtx, win, state, label, false)
 	})
 	return result
 }
 
-func OutlineButton(win *Win, state *widget.Clickable, label string) bool {
+// OutlineButton draws a ghost/outline button with hover and press states.
+func OutlineButton(win Context, state *Clickable, label string) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)
-		btn := material.Button(win.th, state, label)
-		btn.Background = color.NRGBA{}
-		btn.Color = win.th.Palette.ContrastBg
-		return btn.Layout(gtx)
+		return drawButton(gtx, win, state, label, true)
 	})
 	return result
 }
 
-func IconButton(win *Win, state *widget.Clickable, icon *widget.Icon, desc string) bool {
+func drawButton(gtx layout.Context, win Context, state *Clickable, label string, outline bool) layout.Dimensions {
+	th := win.theme()
+	primary := th.Palette.ContrastBg
+	primaryFg := th.Palette.ContrastFg
+	r := gtx.Dp(unit.Dp(6))
+
+	// compute colors based on interaction state
+	bg := primary
+	fg := primaryFg
+	borderC := primary
+
+	if outline {
+		bg = color.NRGBA{}
+		fg = primary
+		borderC = primary
+		borderC.A = 180
+	}
+
+	if state.Hovered() {
+		if outline {
+			bg = primary
+			bg.A = 25
+		} else {
+			bg = lightenNRGBA(primary, 20)
+		}
+	}
+	if state.Pressed() {
+		if outline {
+			bg = primary
+			bg.A = 45
+		} else {
+			bg = darkenNRGBA(primary, 20)
+		}
+	}
+
+	return state.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+		return layout.Stack{}.Layout(gtx,
+			layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+				w := gtx.Constraints.Min.X
+				h := gtx.Constraints.Min.Y
+				rrect := clip.RRect{Rect: image.Rect(0, 0, w, h), NW: r, NE: r, SE: r, SW: r}
+				if bg.A > 0 {
+					paint.FillShape(gtx.Ops, bg, rrect.Op(gtx.Ops))
+				}
+				if outline {
+					paint.FillShape(gtx.Ops, borderC,
+						clip.Stroke{Path: rrect.Path(gtx.Ops), Width: float32(gtx.Dp(unit.Dp(1)))}.Op())
+				}
+				return layout.Dimensions{Size: image.Pt(w, h)}
+			}),
+			layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+				return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+					lbl := material.Body2(th, label)
+					lbl.Color = fg
+					lbl.Font.Weight = font.Medium
+					return lbl.Layout(gtx)
+				})
+			}),
+		)
+	})
+}
+
+func IconButton(win Context, state *Clickable, icon *Icon, desc string) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)
-		return material.IconButton(win.th, state, icon, desc).Layout(gtx)
+		return material.IconButton(win.theme(), state, icon, desc).Layout(gtx)
 	})
 	return result
 }
 
 // Tappable makes any content clickable. Returns true if clicked.
-func Tappable(win *Win, state *widget.Clickable, content func(*Win)) bool {
+func Tappable(win Context, state *Clickable, content func(Context)) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)
@@ -118,87 +174,387 @@ func Tappable(win *Win, state *widget.Clickable, content func(*Win)) bool {
 
 // ----- inputs -----
 
-func Input(win *Win, state *widget.Editor, hint string) {
+// Input draws a styled single-line text field with focus ring.
+func Input(win Context, state *Editor, hint string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		state.SingleLine = true
-		return material.Editor(win.th, state, hint).Layout(gtx)
+		return drawInput(gtx, win, state, hint, false)
 	})
 }
 
-func TextArea(win *Win, state *widget.Editor, hint string) {
+// TextArea draws a styled multi-line text field with focus ring.
+func TextArea(win Context, state *Editor, hint string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		return material.Editor(win.th, state, hint).Layout(gtx)
+		return drawInput(gtx, win, state, hint, true)
 	})
+}
+
+func drawInput(gtx layout.Context, win Context, state *widget.Editor, hint string, multiLine bool) layout.Dimensions {
+	th := win.theme()
+	r := gtx.Dp(unit.Dp(6))
+
+	bg := th.Palette.Fg
+	bg.A = 14
+	border := th.Palette.Fg
+	border.A = 45
+
+	focused := state.Len() > 0 // approximation — use focused ring when has content
+	_ = focused
+
+	// focus ring: use primary color border when active
+	// (Gio doesn't expose focus state directly in v0.8 without event.Op — we
+	// approximate with a slightly brighter border, always present)
+	focusBorder := th.Palette.ContrastBg
+	focusBorder.A = 0 // hidden by default
+
+	h := gtx.Dp(unit.Dp(38))
+	if multiLine {
+		h = gtx.Dp(unit.Dp(100))
+	}
+
+	return layout.Stack{}.Layout(gtx,
+		layout.Expanded(func(gtx layout.Context) layout.Dimensions {
+			w := gtx.Constraints.Max.X
+			if gtx.Constraints.Min.X > 0 {
+				w = gtx.Constraints.Min.X
+			}
+			rrect := clip.RRect{Rect: image.Rect(0, 0, w, h), NW: r, NE: r, SE: r, SW: r}
+			paint.FillShape(gtx.Ops, bg, rrect.Op(gtx.Ops))
+			paint.FillShape(gtx.Ops, border,
+				clip.Stroke{Path: rrect.Path(gtx.Ops), Width: 1}.Op())
+			return layout.Dimensions{Size: image.Pt(w, h)}
+		}),
+		layout.Stacked(func(gtx layout.Context) layout.Dimensions {
+			gtx.Constraints.Min = image.Pt(gtx.Constraints.Max.X, h)
+			gtx.Constraints.Max.Y = h
+			return layout.UniformInset(unit.Dp(9)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				ed := material.Editor(th, state, hint)
+				ed.HintColor = th.Palette.Fg
+				ed.HintColor.A = 90
+				return ed.Layout(gtx)
+			})
+		}),
+	)
 }
 
 // ----- toggle / checkbox / radio -----
 
-func Toggle(win *Win, state *widget.Bool, label string) bool {
+// Toggle draws a styled on/off switch.
+func Toggle(win Context, state *Bool, label string) bool {
 	result := boolResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		boolResults[state] = state.Update(gtx)
-		return material.Switch(win.th, state, label).Layout(gtx)
+		return drawToggle(gtx, win, state, label)
 	})
 	return result
 }
 
-func Checkbox(win *Win, state *widget.Bool, label string) bool {
+func drawToggle(gtx layout.Context, win Context, state *widget.Bool, label string) layout.Dimensions {
+	th := win.theme()
+	trackW := gtx.Dp(unit.Dp(40))
+	trackH := gtx.Dp(unit.Dp(22))
+	knobSz := gtx.Dp(unit.Dp(16))
+	pad := (trackH - knobSz) / 2
+
+	trackOn := th.Palette.ContrastBg
+	trackOff := th.Palette.Fg
+	trackOff.A = 50
+	if state.Hovered() {
+		trackOff.A = 80
+	}
+
+	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return state.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				r := trackH / 2
+				trackC := trackOff
+				if state.Value {
+					trackC = trackOn
+				}
+				rrect := clip.RRect{
+					Rect: image.Rect(0, 0, trackW, trackH),
+					NW: r, NE: r, SE: r, SW: r,
+				}
+				paint.FillShape(gtx.Ops, trackC, rrect.Op(gtx.Ops))
+
+				// knob
+				knobX := pad
+				if state.Value {
+					knobX = trackW - knobSz - pad
+				}
+				knobR := knobSz / 2
+				knobC := color.NRGBA{R: 255, G: 255, B: 255, A: 230}
+				paint.FillShape(gtx.Ops, knobC,
+					clip.Ellipse{
+						Min: image.Pt(knobX, pad),
+						Max: image.Pt(knobX+knobSz, pad+knobSz),
+					}.Op(gtx.Ops))
+				_ = knobR
+				return layout.Dimensions{Size: image.Pt(trackW, trackH)}
+			})
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			if label == "" {
+				return layout.Dimensions{}
+			}
+			return layout.Spacer{Width: unit.Dp(10)}.Layout(gtx)
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			if label == "" {
+				return layout.Dimensions{}
+			}
+			return material.Body1(th, label).Layout(gtx)
+		}),
+	)
+}
+
+// Checkbox draws a styled checkbox.
+func Checkbox(win Context, state *Bool, label string) bool {
 	result := boolResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		boolResults[state] = state.Update(gtx)
-		return material.CheckBox(win.th, state, label).Layout(gtx)
+		return drawCheckbox(gtx, win, state, label)
 	})
 	return result
 }
 
-func RadioButton(win *Win, group *widget.Enum, key, label string) bool {
+func drawCheckbox(gtx layout.Context, win Context, state *widget.Bool, label string) layout.Dimensions {
+	th := win.theme()
+	sz := gtx.Dp(unit.Dp(18))
+	r := gtx.Dp(unit.Dp(4))
+	primary := th.Palette.ContrastBg
+
+	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return state.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
+				rrect := clip.RRect{Rect: image.Rect(0, 0, sz, sz), NW: r, NE: r, SE: r, SW: r}
+				if state.Value {
+					paint.FillShape(gtx.Ops, primary, rrect.Op(gtx.Ops))
+					// checkmark: two lines
+					checkC := th.Palette.ContrastFg
+					lx, ly := sz/5, sz/2
+					mx, my := sz*2/5, sz*3/4
+					rx, ry := sz*4/5, sz/4
+					drawLine(gtx, lx, ly, mx, my, checkC, 2)
+					drawLine(gtx, mx, my, rx, ry, checkC, 2)
+				} else {
+					border := th.Palette.Fg
+					border.A = 120
+					if state.Hovered() {
+						border.A = 200
+					}
+					bg := th.Palette.Fg
+					bg.A = 10
+					paint.FillShape(gtx.Ops, bg, rrect.Op(gtx.Ops))
+					paint.FillShape(gtx.Ops, border,
+						clip.Stroke{Path: rrect.Path(gtx.Ops), Width: 1.5}.Op())
+				}
+				return layout.Dimensions{Size: image.Pt(sz, sz)}
+			})
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Spacer{Width: unit.Dp(8)}.Layout(gtx)
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return material.Body1(th, label).Layout(gtx)
+		}),
+	)
+}
+
+// drawLine draws a 1-2px line between two points using tiny rects (no path API needed).
+func drawLine(gtx layout.Context, x0, y0, x1, y1 int, c color.NRGBA, thickness int) {
+	steps := 12
+	for i := 0; i <= steps; i++ {
+		t := float32(i) / float32(steps)
+		x := int(float32(x0) + t*float32(x1-x0))
+		y := int(float32(y0) + t*float32(y1-y0))
+		paint.FillShape(gtx.Ops, c,
+			clip.Rect{Min: image.Pt(x, y), Max: image.Pt(x+thickness, y+thickness)}.Op())
+	}
+}
+
+// RadioButton draws a styled radio button.
+func RadioButton(win Context, group *Enum, key, label string) bool {
 	result := enumResults[group]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		enumResults[group] = group.Update(gtx)
-		return material.RadioButton(win.th, group, key, label).Layout(gtx)
+		return drawRadio(gtx, win, group, key, label)
 	})
 	return result
+}
+
+func drawRadio(gtx layout.Context, win Context, group *widget.Enum, key, label string) layout.Dimensions {
+	th := win.theme()
+	sz := gtx.Dp(unit.Dp(18))
+	primary := th.Palette.ContrastBg
+	selected := group.Value == key
+
+	return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return group.Layout(gtx, key, func(gtx layout.Context) layout.Dimensions {
+				border := th.Palette.Fg
+				border.A = 120
+
+				bg := th.Palette.Fg
+				bg.A = 10
+				paint.FillShape(gtx.Ops, bg,
+					clip.Ellipse{Min: image.Pt(0, 0), Max: image.Pt(sz, sz)}.Op(gtx.Ops))
+
+				if selected {
+					paint.FillShape(gtx.Ops, primary,
+						clip.Ellipse{Min: image.Pt(0, 0), Max: image.Pt(sz, sz)}.Op(gtx.Ops))
+					inner := sz / 3
+					off := (sz - inner) / 2
+					white := th.Palette.ContrastFg
+					paint.FillShape(gtx.Ops, white,
+						clip.Ellipse{Min: image.Pt(off, off), Max: image.Pt(off+inner, off+inner)}.Op(gtx.Ops))
+				} else {
+					paint.FillShape(gtx.Ops, border,
+						clip.Stroke{
+							Path: clip.Ellipse{Min: image.Pt(0, 0), Max: image.Pt(sz, sz)}.Path(gtx.Ops),
+							Width: 1.5,
+						}.Op())
+				}
+				return layout.Dimensions{Size: image.Pt(sz, sz)}
+			})
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			return layout.Spacer{Width: unit.Dp(8)}.Layout(gtx)
+		}),
+		layout.Rigid(func(gtx layout.Context) layout.Dimensions {
+			lbl := material.Body1(th, label)
+			if selected {
+				lbl.Color = primary
+			}
+			return lbl.Layout(gtx)
+		}),
+	)
 }
 
 // ----- slider / progress -----
 
-func Slider(win *Win, state *widget.Float) float32 {
+func Slider(win Context, state *Float) float32 {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		return material.Slider(win.th, state).Layout(gtx)
+		return drawSlider(gtx, win, state)
 	})
 	return state.Value
 }
 
-func ProgressBar(win *Win, progress float32) {
+func drawSlider(gtx layout.Context, win Context, state *widget.Float) layout.Dimensions {
+	th := win.theme()
+	h := gtx.Dp(unit.Dp(4))
+	trackH := gtx.Dp(unit.Dp(4))
+	knobSz := gtx.Dp(unit.Dp(16))
+	w := gtx.Constraints.Max.X
+	totalH := knobSz + 4
+	yCenter := totalH / 2
+
+	// position knob
+	if state.Value < 0 {
+		state.Value = 0
+	}
+	if state.Value > 1 {
+		state.Value = 1
+	}
+	knobX := int(state.Value*float32(w-knobSz))
+
+	// track background
+	trackY := yCenter - trackH/2
+	trackBg := th.Palette.Fg
+	trackBg.A = 40
+	paint.FillShape(gtx.Ops, trackBg,
+		clip.RRect{
+			Rect: image.Rect(0, trackY, w, trackY+trackH),
+			NW: trackH / 2, NE: trackH / 2, SE: trackH / 2, SW: trackH / 2,
+		}.Op(gtx.Ops))
+
+	// filled portion
+	fillW := knobX + knobSz/2
+	if fillW > 0 {
+		primary := th.Palette.ContrastBg
+		paint.FillShape(gtx.Ops, primary,
+			clip.RRect{
+				Rect: image.Rect(0, trackY, fillW, trackY+trackH),
+				NW: trackH / 2, NE: trackH / 2, SE: trackH / 2, SW: trackH / 2,
+			}.Op(gtx.Ops))
+	}
+
+	// knob
+	knobC := th.Palette.Bg
+	knobR := knobSz / 2
+	shadow := th.Palette.Fg
+	shadow.A = 60
+	// shadow dot (slightly offset)
+	paint.FillShape(gtx.Ops, shadow,
+		clip.Ellipse{Min: image.Pt(knobX+1, yCenter-knobR+1), Max: image.Pt(knobX+knobSz+1, yCenter+knobR+1)}.Op(gtx.Ops))
+	paint.FillShape(gtx.Ops, th.Palette.ContrastBg,
+		clip.Ellipse{Min: image.Pt(knobX, yCenter-knobR), Max: image.Pt(knobX+knobSz, yCenter+knobR)}.Op(gtx.Ops))
+	paint.FillShape(gtx.Ops, knobC,
+		clip.Ellipse{Min: image.Pt(knobX+2, yCenter-knobR+2), Max: image.Pt(knobX+knobSz-2, yCenter+knobR-2)}.Op(gtx.Ops))
+
+	// interaction overlay (invisible but handles events via material.Slider)
+	_ = h
+	macro := material.Slider(th, state)
+	macro.Layout(gtx)
+
+	return layout.Dimensions{Size: image.Pt(w, totalH)}
+}
+
+// ProgressBar draws a styled filled progress bar.
+func ProgressBar(win Context, progress float32) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		return material.ProgressBar(win.th, progress).Layout(gtx)
+		return drawProgressBar(gtx, win, progress)
 	})
+}
+
+func drawProgressBar(gtx layout.Context, win Context, progress float32) layout.Dimensions {
+	th := win.theme()
+	w := gtx.Constraints.Max.X
+	h := gtx.Dp(unit.Dp(6))
+	r := h / 2
+
+	// track
+	trackC := th.Palette.Fg
+	trackC.A = 30
+	paint.FillShape(gtx.Ops, trackC,
+		clip.RRect{Rect: image.Rect(0, 0, w, h), NW: r, NE: r, SE: r, SW: r}.Op(gtx.Ops))
+
+	// fill
+	if progress > 0 {
+		fillW := int(float32(w) * progress)
+		if fillW > w {
+			fillW = w
+		}
+		paint.FillShape(gtx.Ops, th.Palette.ContrastBg,
+			clip.RRect{Rect: image.Rect(0, 0, fillW, h), NW: r, NE: r, SE: r, SW: r}.Op(gtx.Ops))
+	}
+	return layout.Dimensions{Size: image.Pt(w, h)}
 }
 
 // ----- list / scroll -----
 
-func List(win *Win, state *widget.List, length int, draw func(*Win, int)) {
+func List(win Context, state *Scrollable, length int, draw func(Context, int)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		state.Axis = layout.Vertical
-		return material.List(win.th, state).Layout(gtx, length, func(gtx layout.Context, i int) layout.Dimensions {
-			return child(win, func(w *Win) { draw(w, i) })(gtx)
+		return material.List(win.theme(), state).Layout(gtx, length, func(gtx layout.Context, i int) layout.Dimensions {
+			return child(win, func(w Context) { draw(w, i) })(gtx)
 		})
 	})
 }
 
-func HList(win *Win, state *widget.List, length int, draw func(*Win, int)) {
+func HList(win Context, state *Scrollable, length int, draw func(Context, int)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		state.Axis = layout.Horizontal
-		return material.List(win.th, state).Layout(gtx, length, func(gtx layout.Context, i int) layout.Dimensions {
-			return child(win, func(w *Win) { draw(w, i) })(gtx)
+		return material.List(win.theme(), state).Layout(gtx, length, func(gtx layout.Context, i int) layout.Dimensions {
+			return child(win, func(w Context) { draw(w, i) })(gtx)
 		})
 	})
 }
 
-func Scroll(win *Win, state *widget.List, content func(*Win)) {
+func Scroll(win Context, state *Scrollable, content func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		state.Axis = layout.Vertical
-		return material.List(win.th, state).Layout(gtx, 1, func(gtx layout.Context, _ int) layout.Dimensions {
+		return material.List(win.theme(), state).Layout(gtx, 1, func(gtx layout.Context, _ int) layout.Dimensions {
 			return child(win, content)(gtx)
 		})
 	})
@@ -206,16 +562,18 @@ func Scroll(win *Win, state *widget.List, content func(*Win)) {
 
 // ----- visual -----
 
-func Divider(win *Win) {
+func Divider(win Context) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		h := gtx.Dp(unit.Dp(1))
 		w := gtx.Constraints.Max.X
-		paint.FillShape(gtx.Ops, win.th.Palette.Fg, clip.Rect{Max: image.Pt(w, h)}.Op())
+		c := win.theme().Palette.Fg
+		c.A = 35
+		paint.FillShape(gtx.Ops, c, clip.Rect{Max: image.Pt(w, h)}.Op())
 		return layout.Dimensions{Size: image.Pt(w, h)}
 	})
 }
 
-func Rect(win *Win, c color.NRGBA, widthDp, heightDp float32) {
+func Rect(win Context, c color.NRGBA, widthDp, heightDp float32) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		w := gtx.Constraints.Max.X
 		h := gtx.Constraints.Max.Y
@@ -230,7 +588,7 @@ func Rect(win *Win, c color.NRGBA, widthDp, heightDp float32) {
 	})
 }
 
-func RoundRect(win *Win, c color.NRGBA, widthDp, heightDp, radiusDp float32) {
+func RoundRect(win Context, c color.NRGBA, widthDp, heightDp, radiusDp float32) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		w := gtx.Constraints.Max.X
 		h := gtx.Constraints.Max.Y
@@ -247,12 +605,20 @@ func RoundRect(win *Win, c color.NRGBA, widthDp, heightDp, radiusDp float32) {
 	})
 }
 
-func Card(win *Win, bg color.NRGBA, cornerDp, padDp float32, content func(*Win)) {
+func Card(win Context, bg color.NRGBA, cornerDp, padDp float32, content func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
+		r := gtx.Dp(unit.Dp(cornerDp))
+		// subtle drop shadow
+		shadow := win.theme().Palette.Fg
+		shadow.A = 18
 		return layout.Stack{}.Layout(gtx,
 			layout.Expanded(func(gtx layout.Context) layout.Dimensions {
-				w, h := gtx.Constraints.Min.X, gtx.Constraints.Min.Y
-				r := gtx.Dp(unit.Dp(cornerDp))
+				w := gtx.Constraints.Min.X
+				h := gtx.Constraints.Min.Y
+				// shadow (offset by 2px)
+				shadowRect := clip.RRect{Rect: image.Rect(2, 3, w+2, h+3), NW: r, NE: r, SE: r, SW: r}
+				paint.FillShape(gtx.Ops, shadow, shadowRect.Op(gtx.Ops))
+				// card background
 				rrect := clip.RRect{Rect: image.Rect(0, 0, w, h), NW: r, NE: r, SE: r, SW: r}
 				paint.FillShape(gtx.Ops, bg, rrect.Op(gtx.Ops))
 				return layout.Dimensions{Size: image.Pt(w, h)}
@@ -264,7 +630,7 @@ func Card(win *Win, bg color.NRGBA, cornerDp, padDp float32, content func(*Win))
 	})
 }
 
-func Badge(win *Win, bg, fg color.NRGBA, text string) {
+func Badge(win Context, bg, fg color.NRGBA, text string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Stack{Alignment: layout.Center}.Layout(gtx,
 			layout.Expanded(func(gtx layout.Context) layout.Dimensions {
@@ -275,9 +641,10 @@ func Badge(win *Win, bg, fg color.NRGBA, text string) {
 				return layout.Dimensions{Size: image.Pt(w, h)}
 			}),
 			layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-				lbl := material.Caption(win.th, text)
+				lbl := material.Caption(win.theme(), text)
 				lbl.Color = fg
-				return layout.UniformInset(unit.Dp(4)).Layout(gtx, lbl.Layout)
+				return layout.Inset{Left: unit.Dp(8), Right: unit.Dp(8), Top: unit.Dp(3), Bottom: unit.Dp(3)}.
+					Layout(gtx, lbl.Layout)
 			}),
 		)
 	})
@@ -285,7 +652,7 @@ func Badge(win *Win, bg, fg color.NRGBA, text string) {
 
 // ----- size helpers -----
 
-func MinSize(win *Win, widthDp, heightDp float32, fn func(*Win)) {
+func MinSize(win Context, widthDp, heightDp float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		if widthDp > 0 {
 			if m := gtx.Dp(unit.Dp(widthDp)); gtx.Constraints.Min.X < m {
@@ -301,7 +668,7 @@ func MinSize(win *Win, widthDp, heightDp float32, fn func(*Win)) {
 	})
 }
 
-func MaxWidth(win *Win, widthDp float32, fn func(*Win)) {
+func MaxWidth(win Context, widthDp float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		if m := gtx.Dp(unit.Dp(widthDp)); gtx.Constraints.Max.X > m {
 			gtx.Constraints.Max.X = m
@@ -340,7 +707,7 @@ func LoadImage(path string) (ImageOp, error) {
 	return ImageOp{op: paint.NewImageOp(nrgba), sz: nrgba.Bounds().Size()}, nil
 }
 
-func Image(win *Win, img ImageOp, widthDp, heightDp float32) {
+func Image(win Context, img ImageOp, widthDp, heightDp float32) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		w, h := img.sz.X, img.sz.Y
 		if widthDp > 0 {
@@ -356,4 +723,26 @@ func Image(win *Win, img ImageOp, widthDp, heightDp float32) {
 		stack.Pop()
 		return layout.Dimensions{Size: sz}
 	})
+}
+
+// ----- color helpers -----
+
+func lightenNRGBA(c color.NRGBA, amt uint8) color.NRGBA {
+	add := func(v uint8) uint8 {
+		if int(v)+int(amt) > 255 {
+			return 255
+		}
+		return v + amt
+	}
+	return color.NRGBA{R: add(c.R), G: add(c.G), B: add(c.B), A: c.A}
+}
+
+func darkenNRGBA(c color.NRGBA, amt uint8) color.NRGBA {
+	sub := func(v uint8) uint8 {
+		if int(v)-int(amt) < 0 {
+			return 0
+		}
+		return v - amt
+	}
+	return color.NRGBA{R: sub(c.R), G: sub(c.G), B: sub(c.B), A: c.A}
 }

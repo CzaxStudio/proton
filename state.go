@@ -3,6 +3,14 @@ package proton
 import "gioui.org/widget"
 
 // Re-exported state types so simple programs only need to import proton.
+//
+// These are deliberate type aliases, not wrapped types — unlike Context,
+// which fully hides Gio behind an interface. State types are stable,
+// low-churn structs (Gio's widget.Clickable etc. haven't broken in years),
+// and aliasing them lets you write "var btn proton.Clickable" with a normal
+// zero value, no constructor needed. The API-immunity guarantee applies to
+// everything you pass a Context into — widget functions, layout helpers —
+// which is where Gio's actual churn happens (layout/event internals).
 
 // Clickable tracks clicks on a button or tappable area.
 type Clickable = widget.Clickable
@@ -25,15 +33,10 @@ type Scrollable = widget.List
 // Drag tracks drag gesture state.
 type Drag = widget.Draggable
 
-// NumberState tracks value for a NumberInput stepper.
-// Re-exported here so users don't need to dig into number.go.
-// Actually NumberState is defined in number.go — this comment is just a reminder.
+// Icon holds vector icon data for IconButton.
+type Icon = widget.Icon
 
-// ResizeSplitState tracks drag position for ResizeSplit/ResizeHSplit.
-// Defined in scrollable_split.go.
-
-// TabState, AccordionState, SpinnerState, SelectBoxState, OverlayState
-// are all defined in extra.go.
-
-// AlertKind constants (AlertInfo, AlertSuccess, AlertWarning, AlertError)
-// are defined in alert.go.
+// NumberState (number.go), ResizeSplitState (scrollable_split.go),
+// TabState / AccordionState / SpinnerState / SelectBoxState / OverlayState
+// (extra.go), and AlertKind (alert.go) are Proton-native types — not Gio
+// aliases — declared in their respective files.

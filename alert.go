@@ -16,9 +16,9 @@ type AlertKind int
 
 const (
 	AlertInfo    AlertKind = iota // blue — informational
-	AlertSuccess                  // green — success
-	AlertWarning                  // yellow — caution
-	AlertError                    // red — something went wrong
+	AlertSuccess                   // green — success
+	AlertWarning                   // yellow — caution
+	AlertError                     // red — something went wrong
 )
 
 // Alert draws a colored banner with a message — like an inline notification
@@ -29,7 +29,7 @@ const (
 //	proton.Alert(win, proton.AlertSuccess, "Your changes have been saved.")
 //	proton.Alert(win, proton.AlertWarning, "This action cannot be undone.")
 //	proton.Alert(win, proton.AlertInfo, "The app will restart to apply updates.")
-func Alert(win *Win, kind AlertKind, message string) {
+func Alert(win Context, kind AlertKind, message string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		var bg, fg, accent color.NRGBA
 		switch kind {
@@ -65,7 +65,7 @@ func Alert(win *Win, kind AlertKind, message string) {
 				barW := gtx.Dp(unit.Dp(3))
 				barRect := clip.RRect{
 					Rect: image.Rect(0, 0, barW, h),
-					NW:   r, NE: 0, SE: 0, SW: r,
+					NW: r, NE: 0, SE: 0, SW: r,
 				}
 				paint.FillShape(gtx.Ops, accent, barRect.Op(gtx.Ops))
 				return layout.Dimensions{Size: image.Pt(w, h)}
@@ -75,7 +75,7 @@ func Alert(win *Win, kind AlertKind, message string) {
 					Top: unit.Dp(10), Bottom: unit.Dp(10),
 					Left: unit.Dp(14), Right: unit.Dp(12),
 				}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					lbl := material.Body2(win.th, message)
+					lbl := material.Body2(win.theme(), message)
 					lbl.Color = fg
 					return lbl.Layout(gtx)
 				})
@@ -98,7 +98,7 @@ func Alert(win *Win, kind AlertKind, message string) {
 //	        u.showAlert = false
 //	    }
 //	}
-func AlertDismissable(win *Win, closeBtn *Clickable, kind AlertKind, message string) bool {
+func AlertDismissable(win Context, closeBtn *Clickable, kind AlertKind, message string) bool {
 	var dismissed bool
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		if closeBtn.Clicked(gtx) {
@@ -138,7 +138,7 @@ func AlertDismissable(win *Win, closeBtn *Clickable, kind AlertKind, message str
 				barW := gtx.Dp(unit.Dp(3))
 				barRect := clip.RRect{
 					Rect: image.Rect(0, 0, barW, h),
-					NW:   r, NE: 0, SE: 0, SW: r,
+					NW: r, NE: 0, SE: 0, SW: r,
 				}
 				paint.FillShape(gtx.Ops, accent, barRect.Op(gtx.Ops))
 				return layout.Dimensions{Size: image.Pt(w, h)}
@@ -150,13 +150,13 @@ func AlertDismissable(win *Win, closeBtn *Clickable, kind AlertKind, message str
 				}.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
 						layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-							lbl := material.Body2(win.th, message)
+							lbl := material.Body2(win.theme(), message)
 							lbl.Color = fg
 							return lbl.Layout(gtx)
 						}),
 						layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 							return closeBtn.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								lbl := material.Body2(win.th, "×")
+								lbl := material.Body2(win.theme(), "×")
 								lbl.Color = fg
 								return lbl.Layout(gtx)
 							})

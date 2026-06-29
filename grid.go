@@ -12,7 +12,7 @@ import (
 //	    func(win *proton.Win) { proton.Label(win, "two") },
 //	    func(win *proton.Win) { proton.Label(win, "three") },
 //	)
-func Grid(win *Win, cols int, gapDp float32, cells ...func(*Win)) {
+func Grid(win Context, cols int, gapDp float32, cells ...func(Context)) {
 	if cols <= 0 {
 		cols = 1
 	}

@@ -18,7 +18,7 @@ func main() {
     u := &UI{}
     a := proton.New("my app")
     a.ApplyPalette(proton.NordPalette)
-    a.Window("Hello", 480, 300, func(win *proton.Win) {
+    a.Window("Hello", 480, 300, func(win proton.Context) {
         proton.H3(win, "Hello from Proton!")
         proton.Gap(win, 8)
         proton.Input(win, &u.name, "Your name")
@@ -106,23 +106,23 @@ Widgets stack vertically by default. Use `Row` or `Column` to group them differe
 ```go
 // side by side
 proton.Row(win,
-    func(win *proton.Win) { proton.Label(win, "left") },
-    func(win *proton.Win) { proton.Label(win, "right") },
+    func(win proton.Context) { proton.Label(win, "left") },
+    func(win proton.Context) { proton.Label(win, "right") },
 )
 
 // one child fills remaining space
 proton.GrowRow(win,
-    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "Search:") }),
-    proton.GrowItem(win, func(win *proton.Win) { proton.Input(win, &e, "") }),
-    proton.FixedItem(win, func(win *proton.Win) { proton.Button(win, &b, "Go") }),
+    proton.FixedItem(win, func(win proton.Context) { proton.Label(win, "Search:") }),
+    proton.GrowItem(win, func(win proton.Context) { proton.Input(win, &e, "") }),
+    proton.FixedItem(win, func(win proton.Context) { proton.Button(win, &b, "Go") }),
 )
 
 // split pane (draggable)
 proton.ResizeSplit(win, &u.split, 0.35, leftFn, rightFn)
 
 // padding
-proton.Pad(win, 16, func(win *proton.Win) { ... })
-proton.PadSides(win, 8, 16, 8, 16, func(win *proton.Win) { ... })
+proton.Pad(win, 16, func(win proton.Context) { ... })
+proton.PadSides(win, 8, 16, 8, 16, func(win proton.Context) { ... })
 
 // blank gap
 proton.Gap(win, 12)
@@ -186,8 +186,8 @@ go func() {
 ## Keyboard shortcuts
 
 ```go
-proton.OnKey(win, key.ModCtrl, "S", func() { save() })
-proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
+proton.OnKey(win, proton.ModCtrl, "S", func() { save() })
+proton.OnKey(win, proton.ModNone, proton.KeyEscape, func() { closeDialog() })
 ```
 
 ---
@@ -206,18 +206,18 @@ go run ./examples/kitchen      # every widget in one place
 
 ## Docs
 
-See the [`docs`]((https://github.com/CzaxStudio/proton-documentation)) repo for detailed per-topic guides:
+See the [`docs/`](./docs/README.md) folder for detailed per-topic guides:
 
-- [Getting started]
-- [Text]
-- [Buttons]
-- [Inputs]
-- [Layout]
-- [Lists]
-- [Visuals]
-- [Theming]
-- [Advanced]
-- [Examples]
+- [Getting started](./docs/00-getting-started.md)
+- [Text](./docs/01-text.md)
+- [Buttons](./docs/02-buttons.md)
+- [Inputs](./docs/03-inputs.md)
+- [Layout](./docs/04-layout.md)
+- [Lists](./docs/05-lists.md)
+- [Visuals](./docs/06-visuals.md)
+- [Theming](./docs/07-theming.md)
+- [Advanced](./docs/08-advanced.md)
+- [Examples](./docs/09-examples.md)
 
 ---
 
