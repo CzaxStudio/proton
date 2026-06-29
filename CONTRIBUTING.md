@@ -12,7 +12,7 @@ We are open to accepting new contributors! If you would like to join the project
 To contribute, you should have:
 - At least one active/high-quality GitHub repository.
 - Experience as a Go developer.
-- Good knowledge of GUI toolkits (especially Gio).
+- Good knowledge of GUI toolkits (especially immediate mode ones like Gio).
 
 ## Getting Started & Prerequisites
 
