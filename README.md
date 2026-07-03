@@ -61,7 +61,7 @@ import "github.com/CzaxStudio/proton"
 
 func main() {
 	a := proton.New("hello")
-	a.Window("Hello", 400, 200, func(win proton.Context) // Proton win has changed to Context {
+	a.Window("Hello", 400, 200, func(win proton.Context) {   // Proton win has changed to Context
 		proton.H3(win, "Hello from Proton!")
 	})
 	a.Run()
