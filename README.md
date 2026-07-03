@@ -32,7 +32,10 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 ## Documentation 
 
-#### https://github.com/CzaxStudio/proton-documentation
+#### Official Docs: https://nexus-65.gitbook.io/proton
+
+#### Repo: https://github.com/CzaxStudio/proton-documentation
+
 
 ## Example apps (made using Proton)
 
