@@ -4,7 +4,7 @@ A GUI library for Go that doesn't make you want to switch to web dev.
 
 ### Currently under development for v0.2.5
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
+[![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mention-badge.svg)](https://github.com/avelino/awesome-go)
 
 ## Our First Stargazers
 
@@ -12,22 +12,16 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 <table>
   <tr>
-    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu(First Stargazer)</b></sub></a></td>
+    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu</b><br />(First Stargazer)</sub></a></td>
     <td align="center"><a href="https://github.com/bigwhite"><img src="https://github.com/bigwhite.png?size=100" width="100px;" alt=""/><br /><sub><b>@bigwhite</b></sub></a></td>
     <td align="center"><a href="https://github.com/TanmayCzax"><img src="https://github.com/TanmayCzax.png?size=100" width="100px;" alt=""/><br /><sub><b>@TanmayCzax</b></sub></a></td>
     <td align="center"><a href="https://github.com/aurax"><img src="https://github.com/aurax.png?size=100" width="100px;" alt=""/><br /><sub><b>@aurax</b></sub></a></td>
     <td align="center"><a href="https://github.com/DemonK1"><img src="https://github.com/DemonK1.png?size=100" width="100px;" alt=""/><br /><sub><b>@DemonK1</b></sub></a></td>
-    <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a>
-</td>
-</td>
-    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube.png?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a>
-</td>
- </td>
-    <td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille.png?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a></td>   
-</td>
+    <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a></td>
+    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube.png?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a></td>
+    <td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille.png?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a></td>
     <td align="center"><a href="https://github.com/alanmsant2"><img src="https://github.com/alanmsant2.png?size=100" width="100px;" alt=""/><br /><sub><b>@alanmsant2</b></sub></a></td>
-    
-</tr>
+  </tr>
 </table>
 
 ## Documentation 
@@ -61,7 +55,7 @@ import "github.com/CzaxStudio/proton"
 
 func main() {
 	a := proton.New("hello")
-	a.Window("Hello", 400, 200, func(win proton.Context) {   // Proton win has changed to Context
+	a.Window("Hello", 400, 200, func(win proton.Context) {
 		proton.H3(win, "Hello from Proton!")
 	})
 	a.Run()
@@ -85,7 +79,7 @@ macOS and Windows need nothing extra.
 
 ## How it works
 
-Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct using Proton's re-exported types, so you only ever need one import.
+Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct using Proton's re-exported types, so you only ever need one redraw loop.
 
 ```go
 type UI struct {
@@ -241,18 +235,7 @@ go run ./examples/kitchen      # every widget in one place
 
 ## Docs
 
-See the [`docs`]((https://github.com/CzaxStudio/proton-documentation)) repo for detailed per-topic guides:
-
-- [Getting started]
-- [Text]
-- [Buttons]
-- [Inputs]
-- [Layout]
-- [Lists]
-- [Visuals]
-- [Theming]
-- [Advanced]
-- [Examples]
+See the [proton-documentation](https://github.com/CzaxStudio/proton-documentation) repo for detailed per-topic guides.
 
 ---
 
