@@ -16,8 +16,6 @@ import (
 	"gioui.org/widget/material"
 )
 
-// ----- Tag -----
-
 // TagState holds state for a dismissable tag chip.
 //
 //	type UI struct {
@@ -84,8 +82,6 @@ func Tag(win Context, state *TagState, bg, fg color.NRGBA, label string, onClose
 	})
 }
 
-// ----- Avatar -----
-
 // Avatar draws a circular badge showing initials or a short label.
 // Good for user profile pictures when no image is available.
 //
@@ -112,8 +108,6 @@ func Avatar(win Context, initials string, bg, fg color.NRGBA, sizeDp float32) {
 		)
 	})
 }
-
-// ----- ProgressRing -----
 
 // ProgressRing draws a circular progress indicator.
 // progress is 0.0–1.0. sizeDp is the diameter. strokeDp is the ring width.
@@ -162,8 +156,6 @@ func drawArc(gtx layout.Context, cx, cy, r, strokeW, from, to float32, c color.N
 			clip.Rect{Min: image.Pt(bx, by), Max: image.Pt(bx+bw, by+bw)}.Op())
 	}
 }
-
-// ----- Stepper -----
 
 // Stepper draws a horizontal step-progress indicator.
 // current is the active step index (0-based). steps is the list of step names.
@@ -263,8 +255,6 @@ func Stepper(win Context, current int, steps []string) {
 	})
 }
 
-// ----- Table -----
-
 // TableRow is one row in a Table. It is a slice of cell strings.
 type TableRow = []string
 
@@ -363,8 +353,6 @@ func Table(win Context, columns []string, rows []TableRow) {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx, allRows...)
 	})
 }
-
-// ----- SearchInput -----
 
 // SearchState holds state for a SearchInput.
 //

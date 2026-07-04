@@ -18,8 +18,6 @@ import (
 	"gioui.org/widget/material"
 )
 
-// ----- Tabs -----
-
 // TabState tracks which tab is selected.
 //
 //	type UI struct {
@@ -30,14 +28,13 @@ type TabState struct {
 	Selected int
 }
 
-// Tabs draws a horizontal tab bar. labels are the tab names, btns is one
-// Clickable per tab. content is called with the selected tab index.
+// Tabs draws a horizontal tab bar and calls content with the active tab index.
 //
-//	proton.Tabs(win, []string{"Files", "Settings"}, u.tabBtns[:], &u.tabs,
-//	    func(win *proton.Win, i int) {
+//	proton.Tabs(ctx, []string{"Files", "Settings"}, u.tabBtns[:], &u.tabs,
+//	    func(ctx proton.Context, i int) {
 //	        switch i {
-//	        case 0: drawFiles(win)
-//	        case 1: drawSettings(win)
+//	        case 0: drawFiles(ctx)
+//	        case 1: drawSettings(ctx)
 //	        }
 //	    },
 //	)
@@ -101,8 +98,6 @@ func Tabs(win Context, labels []string, btns []Clickable, state *TabState, conte
 	})
 }
 
-// ----- Accordion -----
-
 // AccordionState tracks whether a collapsible section is open or closed.
 //
 //	type UI struct {
@@ -115,7 +110,7 @@ type AccordionState struct {
 
 // Accordion draws a collapsible section with a clickable header.
 //
-//	proton.Accordion(win, &u.sec1, &u.sec1btn, "Advanced", func(win *proton.Win) {
+//	proton.Accordion(win, &u.sec1, &u.sec1btn, "Advanced", func(ctx proton.Context) {
 //	    proton.Label(win, "Hidden until expanded.")
 //	})
 func Accordion(win Context, state *AccordionState, btn *Clickable, title string, content func(Context)) {
@@ -174,8 +169,6 @@ func drawChevron(gtx layout.Context, win Context, open bool) layout.Dimensions {
 	paint.FillShape(gtx.Ops, c, clip.Outline{Path: path.End()}.Op())
 	return layout.Dimensions{Size: image.Pt(sz+4, sz)}
 }
-
-// ----- Spinner -----
 
 // SpinnerState tracks the animation start time.
 //
@@ -245,8 +238,6 @@ func Spinner(win Context, state *SpinnerState, sizeDp float32) {
 		return layout.Dimensions{Size: image.Pt(sz, sz)}
 	})
 }
-
-// ----- SelectBox -----
 
 // SelectBoxState holds the open/closed state and per-item clickables.
 //
@@ -393,8 +384,6 @@ func SelectBox(win Context, state *SelectBoxState, options []string) int {
 	return state.Selected
 }
 
-// ----- LabeledDivider -----
-
 // LabeledDivider draws a horizontal rule with an optional centered label.
 // Pass an empty string for a plain divider.
 //
@@ -432,16 +421,14 @@ func LabeledDivider(win Context, label string) {
 	})
 }
 
-// ----- ZStack (z-axis layering) -----
-
 // ZStack draws multiple widgets layered on top of each other.
 // The first is drawn at the bottom, the last is on top.
 // All layers share the same available space.
 //
 //	proton.ZStack(win,
-//	    func(win *proton.Win) { proton.Rect(win, proton.RGB(0x1e1e2e), 0, 120) },
-//	    func(win *proton.Win) {
-//	        proton.Center(win, func(win *proton.Win) { proton.Label(win, "on top") })
+//	    func(ctx proton.Context) { proton.Rect(win, proton.RGB(0x1e1e2e), 0, 120) },
+//	    func(ctx proton.Context) {
+//	        proton.Center(win, func(ctx proton.Context) { proton.Label(win, "on top") })
 //	    },
 //	)
 func ZStack(win Context, layers ...func(Context)) {
@@ -459,8 +446,6 @@ func ZStack(win Context, layers ...func(Context)) {
 	})
 }
 
-// ----- Overlay / Modal -----
-
 // OverlayState controls whether the overlay is visible.
 //
 //	type UI struct {
@@ -471,11 +456,11 @@ func ZStack(win Context, layers ...func(Context)) {
 //	if proton.Button(win, &u.openBtn, "Open") {
 //	    u.modal.Show()
 //	}
-//	proton.Overlay(win, &u.modal, func(win *proton.Win) {
-//	    proton.Card(win, proton.RGB(0x1e1e2e), 12, 24, func(win *proton.Win) {
+//	proton.Overlay(win, &u.modal, func(ctx proton.Context) {
+//	    proton.Card(win, proton.RGB(0x1e1e2e), 12, 24, func(ctx proton.Context) {
 //	        proton.H5(win, "Dialog Title")
 //	        proton.Gap(win, 8)
-//	        proton.Pad(win, 4, func(win *proton.Win) {
+//	        proton.Pad(win, 4, func(ctx proton.Context) {
 //	            if proton.Button(win, &u.closeBtn, "Close") { u.modal.Hide() }
 //	        })
 //	    })
@@ -508,8 +493,6 @@ func Overlay(win Context, state *OverlayState, content func(Context)) {
 	})
 }
 
-// ----- Spacer -----
-
 // FlexSpacer returns a flexible empty space that fills remaining room in a
 // GrowRow or GrowColumn, pushing siblings to opposite edges.
 //
@@ -524,13 +507,11 @@ func FlexSpacer() FlexItem {
 	})}
 }
 
-// ----- Conditional rendering helper -----
-
 // If only draws content when cond is true.
 // Saves you from wrapping everything in a Go if block when you just
 // want to show or hide a single widget.
 //
-//	proton.If(win, user.IsAdmin, func(win *proton.Win) {
+//	proton.If(win, user.IsAdmin, func(ctx proton.Context) {
 //	    proton.Button(win, &u.deleteBtn, "Delete All Users")
 //	})
 func If(win Context, cond bool, content func(Context)) {
@@ -542,14 +523,12 @@ func If(win Context, cond bool, content func(Context)) {
 	})
 }
 
-// ----- Clickable area with hover background -----
-
 // HoverCard wraps content in an area that highlights on hover.
 // bg is the normal background, hover is the color when the mouse is over it.
 // Returns true if clicked.
 //
 //	var row proton.Clickable
-//	if proton.HoverCard(win, &row, proton.RGB(0x1e1e2e), proton.RGB(0x2a2a3e), 8, func(win *proton.Win) {
+//	if proton.HoverCard(win, &row, proton.RGB(0x1e1e2e), proton.RGB(0x2a2a3e), 8, func(ctx proton.Context) {
 //	    proton.Label(win, "hover me")
 //	}) {
 //	    println("clicked")

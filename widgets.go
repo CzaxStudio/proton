@@ -23,8 +23,6 @@ var clickResults = map[*Clickable]bool{}
 var boolResults  = map[*Bool]bool{}
 var enumResults  = map[*Enum]bool{}
 
-// ----- text -----
-
 func Label(win Context, text string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return material.Body1(win.theme(), text).Layout(gtx)
@@ -68,8 +66,6 @@ func Text(win Context, s string, size float32, c color.NRGBA, bold bool) {
 		return lbl.Layout(gtx)
 	})
 }
-
-// ----- custom-drawn buttons -----
 
 // Button draws a filled button with hover and press states.
 func Button(win Context, state *Clickable, label string) bool {
@@ -172,8 +168,6 @@ func Tappable(win Context, state *Clickable, content func(Context)) bool {
 	return result
 }
 
-// ----- inputs -----
-
 // Input draws a styled single-line text field with focus ring.
 func Input(win Context, state *Editor, hint string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
@@ -236,8 +230,6 @@ func drawInput(gtx layout.Context, win Context, state *widget.Editor, hint strin
 		}),
 	)
 }
-
-// ----- toggle / checkbox / radio -----
 
 // Toggle draws a styled on/off switch.
 func Toggle(win Context, state *Bool, label string) bool {
@@ -431,8 +423,6 @@ func drawRadio(gtx layout.Context, win Context, group *widget.Enum, key, label s
 	)
 }
 
-// ----- slider / progress -----
-
 func Slider(win Context, state *Float) float32 {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return drawSlider(gtx, win, state)
@@ -531,8 +521,6 @@ func drawProgressBar(gtx layout.Context, win Context, progress float32) layout.D
 	return layout.Dimensions{Size: image.Pt(w, h)}
 }
 
-// ----- list / scroll -----
-
 func List(win Context, state *Scrollable, length int, draw func(Context, int)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		state.Axis = layout.Vertical
@@ -559,8 +547,6 @@ func Scroll(win Context, state *Scrollable, content func(Context)) {
 		})
 	})
 }
-
-// ----- visual -----
 
 func Divider(win Context) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
@@ -650,8 +636,6 @@ func Badge(win Context, bg, fg color.NRGBA, text string) {
 	})
 }
 
-// ----- size helpers -----
-
 func MinSize(win Context, widthDp, heightDp float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		if widthDp > 0 {
@@ -676,8 +660,6 @@ func MaxWidth(win Context, widthDp float32, fn func(Context)) {
 		return child(win, fn)(gtx)
 	})
 }
-
-// ----- image -----
 
 type ImageOp struct {
 	op paint.ImageOp
@@ -724,8 +706,6 @@ func Image(win Context, img ImageOp, widthDp, heightDp float32) {
 		return layout.Dimensions{Size: sz}
 	})
 }
-
-// ----- color helpers -----
 
 func lightenNRGBA(c color.NRGBA, amt uint8) color.NRGBA {
 	add := func(v uint8) uint8 {

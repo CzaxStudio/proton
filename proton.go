@@ -30,6 +30,7 @@ type App struct {
 	windows    []*winDef
 	bgColor    *color.NRGBA
 	bgGradient *gradient
+	logo       *logoState
 }
 
 type winDef struct {
@@ -169,7 +170,7 @@ func runWin(a *App, def *winDef) {
 			drawBackground(gtx, a, frame)
 
 			layout.UniformInset(unit.Dp(12)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				c := &winImpl{th: a.theme, win: w}
+				c := &winImpl{th: a.theme, win: w, logo: a.logo}
 				def.draw(c)
 				return material.List(a.theme, &rootList).Layout(gtx,
 					len(c.widgets),
@@ -277,11 +278,8 @@ func hsvColor(h, s, v float32) color.NRGBA {
 // ----- Context -----
 
 // Context is passed to every draw function and layout callback.
-// It is Proton's only public handle into the rendering system —
-// no Gio types are ever exposed through it. This is what makes
-// Proton immune to breaking changes in Gio's internal API: as long
-// as this interface's contract stays the same, your code keeps working
-// across any future Gio version bump.
+// It is the only type in Proton's public API that touches the rendering
+// system — no Gio types leak through it.
 //
 //	a.Window("App", 480, 300, func(ctx proton.Context) {
 //	    proton.Label(ctx, "Hello")
@@ -298,17 +296,17 @@ type Context interface {
 	add(fn gioWidget)
 	theme() *material.Theme
 	rawWindow() *app.Window
+	appLogo() *logoState
 }
 
 // gioWidget is the internal draw closure type. Never exported.
 type gioWidget = func(gtx layout.Context) layout.Dimensions
 
-// winImpl is the concrete, unexported implementation of Context.
-// Renaming, restructuring, or swapping this out never affects user code
-// because users only ever interact with the Context interface.
+// winImpl is the unexported concrete implementation of Context.
 type winImpl struct {
 	th      *material.Theme
 	win     *app.Window
+	logo    *logoState
 	widgets []gioWidget
 }
 
@@ -316,6 +314,7 @@ func (c *winImpl) Invalidate()                { c.win.Invalidate() }
 func (c *winImpl) add(fn gioWidget)            { c.widgets = append(c.widgets, fn) }
 func (c *winImpl) theme() *material.Theme      { return c.th }
 func (c *winImpl) rawWindow() *app.Window      { return c.win }
+func (c *winImpl) appLogo() *logoState         { return c.logo }
 
 // run lays out all collected widgets as a vertical Flex.
 func (c *winImpl) run(gtx layout.Context) layout.Dimensions {
@@ -335,7 +334,7 @@ func (c *winImpl) run(gtx layout.Context) layout.Dimensions {
 // Every layout helper (Row, Column, Pad, Split, ...) uses this.
 func child(parent Context, fn func(Context)) gioWidget {
 	return func(gtx layout.Context) layout.Dimensions {
-		c := &winImpl{th: parent.theme(), win: parent.rawWindow()}
+		c := &winImpl{th: parent.theme(), win: parent.rawWindow(), logo: parent.appLogo()}
 		fn(c)
 		return c.run(gtx)
 	}

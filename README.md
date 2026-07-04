@@ -224,3 +224,57 @@ See the [`docs/`](./docs/README.md) folder for detailed per-topic guides:
 ## License
 
 MIT
+
+---
+
+## Logo
+
+Load a logo once at startup and draw it anywhere:
+
+```go
+//go:embed assets/logo.png
+var logoBytes []byte
+
+func main() {
+    a := proton.New("myapp")
+    a.SetLogoBytes(logoBytes)
+
+    a.Window("My App", 480, 300, func(ctx proton.Context) {
+        proton.Logo(ctx, 48, 48)
+        proton.Gap(ctx, 8)
+        proton.H4(ctx, "My App")
+    })
+    a.Run()
+}
+```
+
+Or load from a file path:
+
+```go
+a.SetLogo("assets/logo.png")
+```
+
+Both PNG and JPEG work. The image is decoded once and cached — never re-read per frame.
+
+---
+
+## Android
+
+Proton apps run on Android through Gio's native support. Same code, no rewrites.
+
+Install the build tool:
+
+```bash
+go install gioui.org/cmd/gogio@latest
+```
+
+Build an APK:
+
+```bash
+gogio -target android -appid com.yourname.yourapp .
+adb install yourapp.apk
+```
+
+Full setup guide: [docs/10-android.md](./docs/10-android.md)
+
+---

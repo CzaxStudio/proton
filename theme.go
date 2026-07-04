@@ -49,8 +49,6 @@ func MakePalette(bg, fg, primary, primaryFg uint32) Palette {
 	}
 }
 
-// ----- dark themes -----
-
 var DarkPalette = MakePalette(0x121212, 0xdcdcdc, 0x6464f0, 0xffffff)
 
 var NordPalette = MakePalette(0x2e3440, 0xd8dee9, 0x88c0d0, 0x2e3440)
@@ -119,8 +117,6 @@ var HackerPalette = MakePalette(0x000000, 0x00ff00, 0x008f11, 0x000000)
 // CyberpunkPalette — neon pink on near-black, lime accent.
 var CyberpunkPalette = MakePalette(0x1a0b0b, 0xff2a6d, 0xd1ff00, 0x000000)
 
-// ----- light themes -----
-
 // LightPalette — clean, neutral light theme.
 var LightPalette = MakePalette(0xfafafa, 0x1a1a1a, 0x5b5bd6, 0xffffff)
 
@@ -150,8 +146,6 @@ var EverforestLightPalette = MakePalette(0xfdf6e3, 0x5c6a72, 0x8da101, 0xfdf6e3)
 
 // NordLightPalette — Nord's lighter, warmer variant.
 var NordLightPalette = MakePalette(0xeceff4, 0x2e3440, 0x5e81ac, 0xeceff4)
-
-// ----- special / novelty -----
 
 // RosePineMoonPalette — Rose Pine's dark moon variant.
 var RosePineMoonPalette = MakePalette(0x232136, 0xe0def4, 0xc4a7e7, 0x232136)
@@ -188,8 +182,6 @@ var TerminalGreenPalette = MakePalette(0x001100, 0x33ff33, 0x00cc00, 0x001100)
 
 // TerminalAmberPalette — amber phosphor terminal.
 var TerminalAmberPalette = MakePalette(0x0d0800, 0xffb000, 0xff8c00, 0x0d0800)
-
-// ----- palette list for pickers -----
 
 // AllPalettes is a slice of all built-in palettes with their names.
 // Useful for building a theme picker UI.
@@ -254,8 +246,6 @@ type NamedPalette struct {
 	Palette Palette
 }
 
-// ----- live theme picker widget -----
-
 // ThemePickerState tracks the picker's scroll and selection.
 //
 //	type UI struct {
@@ -312,8 +302,6 @@ func ThemePicker(win Context, state *ThemePickerState, a *App) {
 		}
 	})
 }
-
-// ----- color code API -----
 
 // Theme is a chainable builder for custom palettes using CSS hex color codes.
 // Get one from a.ThemeBuilder(), set the colors you want, then call Apply().
