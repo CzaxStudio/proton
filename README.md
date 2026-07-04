@@ -206,18 +206,19 @@ go run ./examples/kitchen      # every widget in one place
 
 ## Docs
 
-See the [`docs/`](./docs/README.md) folder for detailed per-topic guides:
+See the Docs for Detailed topics
 
-- [Getting started](./docs/00-getting-started.md)
-- [Text](./docs/01-text.md)
-- [Buttons](./docs/02-buttons.md)
-- [Inputs](./docs/03-inputs.md)
-- [Layout](./docs/04-layout.md)
-- [Lists](./docs/05-lists.md)
-- [Visuals](./docs/06-visuals.md)
-- [Theming](./docs/07-theming.md)
-- [Advanced](./docs/08-advanced.md)
-- [Examples](./docs/09-examples.md)
+Getting started
+- Text
+- Buttons
+- Inputs
+- Layout
+- Lists
+- Visuals
+- Theming
+- Advanced
+- Examples
+- Android
 
 ---
 
@@ -275,6 +276,6 @@ gogio -target android -appid com.yourname.yourapp .
 adb install yourapp.apk
 ```
 
-Full setup guide: [docs/10-android.md](./docs/10-android.md)
+Full setup guide: 10-android.md
 
 ---
