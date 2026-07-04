@@ -2,75 +2,46 @@
 
 A GUI library for Go that doesn't make you want to switch to web dev.
 
-### Currently under development for v0.2.5
-
-[![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
-
-## Our First Stargazers
-
-Thank you to the early adopters who supported Proton from the very beginning!
-
-<table>
-  <tr>
-    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu</b><br />(First Stargazer)</sub></a></td>
-    <td align="center"><a href="https://github.com/bigwhite"><img src="https://github.com/bigwhite.png?size=100" width="100px;" alt=""/><br /><sub><b>@bigwhite</b></sub></a></td>
-    <td align="center"><a href="https://github.com/TanmayCzax"><img src="https://github.com/TanmayCzax.png?size=100" width="100px;" alt=""/><br /><sub><b>@TanmayCzax</b></sub></a></td>
-    <td align="center"><a href="https://github.com/aurax"><img src="https://github.com/aurax.png?size=100" width="100px;" alt=""/><br /><sub><b>@aurax</b></sub></a></td>
-    <td align="center"><a href="https://github.com/DemonK1"><img src="https://github.com/DemonK1.png?size=100" width="100px;" alt=""/><br /><sub><b>@DemonK1</b></sub></a></td>
-    <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a></td>
-    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube.png?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a></td>
-    <td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille.png?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a></td>
-    <td align="center"><a href="https://github.com/alanmsant2"><img src="https://github.com/alanmsant2.png?size=100" width="100px;" alt=""/><br /><sub><b>@alanmsant2</b></sub></a></td>
-  </tr>
-</table>
-
-## Documentation 
-
-#### Official Docs: https://nexus-65.gitbook.io/proton
-
-#### Repo: https://github.com/CzaxStudio/proton-documentation
-
-
-## Example apps (made using Proton)
-
-### Note: I have created basic apps, you can create even better apps with Proton.
-
-
-<img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
-
-<img width="813" height="508" alt="Demo2" src="https://github.com/user-attachments/assets/af7552c4-107f-4760-835a-1ae736f49358" />
-
-
-
-## Logo
-
-<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/e044d0b8-a96f-4bc2-9df9-725a41a99ed2" />
-
-# Getting started
+Built on [Gio](https://gioui.org). No C dependencies. Pure Go. Works on Linux, macOS, and Windows.
 
 ```go
 package main
 
 import "github.com/CzaxStudio/proton"
 
+type UI struct {
+    name proton.Editor
+    btn  proton.Clickable
+}
+
 func main() {
-	a := proton.New("hello")
-	a.Window("Hello", 400, 200, func(win proton.Context) {
-		proton.H3(win, "Hello from Proton!")
-	})
-	a.Run()
+    u := &UI{}
+    a := proton.New("my app")
+    a.ApplyPalette(proton.NordPalette)
+    a.Window("Hello", 480, 300, func(win proton.Context) {
+        proton.H3(win, "Hello from Proton!")
+        proton.Gap(win, 8)
+        proton.Input(win, &u.name, "Your name")
+        proton.Gap(win, 8)
+        if proton.Button(win, &u.btn, "Go") {
+            println("Hello,", u.name.Text())
+        }
+    })
+    a.Run()
 }
 ```
 
+---
+
 ## Install
 
-```
+```bash
 go get github.com/CzaxStudio/proton
 ```
 
-Linux system deps:
-```
-apt install libwayland-dev libxkbcommon-dev libvulkan-dev
+**Linux** — three extra packages required:
+```bash
+sudo apt install libwayland-dev libxkbcommon-dev libvulkan-dev
 ```
 
 macOS and Windows need nothing extra.
@@ -79,7 +50,7 @@ macOS and Windows need nothing extra.
 
 ## How it works
 
-Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct using Proton's re-exported types, so you only ever need one redraw loop.
+Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct using Proton's re-exported types, so you only ever need one import.
 
 ```go
 type UI struct {
@@ -135,23 +106,23 @@ Widgets stack vertically by default. Use `Row` or `Column` to group them differe
 ```go
 // side by side
 proton.Row(win,
-    func(win *proton.Win) { proton.Label(win, "left") },
-    func(win *proton.Win) { proton.Label(win, "right") },
+    func(win proton.Context) { proton.Label(win, "left") },
+    func(win proton.Context) { proton.Label(win, "right") },
 )
 
 // one child fills remaining space
 proton.GrowRow(win,
-    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "Search:") }),
-    proton.GrowItem(win, func(win *proton.Win) { proton.Input(win, &e, "") }),
-    proton.FixedItem(win, func(win *proton.Win) { proton.Button(win, &b, "Go") }),
+    proton.FixedItem(win, func(win proton.Context) { proton.Label(win, "Search:") }),
+    proton.GrowItem(win, func(win proton.Context) { proton.Input(win, &e, "") }),
+    proton.FixedItem(win, func(win proton.Context) { proton.Button(win, &b, "Go") }),
 )
 
 // split pane (draggable)
 proton.ResizeSplit(win, &u.split, 0.35, leftFn, rightFn)
 
 // padding
-proton.Pad(win, 16, func(win *proton.Win) { ... })
-proton.PadSides(win, 8, 16, 8, 16, func(win *proton.Win) { ... })
+proton.Pad(win, 16, func(win proton.Context) { ... })
+proton.PadSides(win, 8, 16, 8, 16, func(win proton.Context) { ... })
 
 // blank gap
 proton.Gap(win, 12)
@@ -215,8 +186,8 @@ go func() {
 ## Keyboard shortcuts
 
 ```go
-proton.OnKey(win, key.ModCtrl, "S", func() { save() })
-proton.OnKey(win, 0, key.NameEscape, func() { closeDialog() })
+proton.OnKey(win, proton.ModCtrl, "S", func() { save() })
+proton.OnKey(win, proton.ModNone, proton.KeyEscape, func() { closeDialog() })
 ```
 
 ---
@@ -235,10 +206,75 @@ go run ./examples/kitchen      # every widget in one place
 
 ## Docs
 
-See the [proton-documentation](https://github.com/CzaxStudio/proton-documentation) repo for detailed per-topic guides.
+See the [`docs/`](./docs/README.md) folder for detailed per-topic guides:
+
+- [Getting started](./docs/00-getting-started.md)
+- [Text](./docs/01-text.md)
+- [Buttons](./docs/02-buttons.md)
+- [Inputs](./docs/03-inputs.md)
+- [Layout](./docs/04-layout.md)
+- [Lists](./docs/05-lists.md)
+- [Visuals](./docs/06-visuals.md)
+- [Theming](./docs/07-theming.md)
+- [Advanced](./docs/08-advanced.md)
+- [Examples](./docs/09-examples.md)
 
 ---
 
 ## License
 
 MIT
+
+---
+
+## Logo
+
+Load a logo once at startup and draw it anywhere:
+
+```go
+//go:embed assets/logo.png
+var logoBytes []byte
+
+func main() {
+    a := proton.New("myapp")
+    a.SetLogoBytes(logoBytes)
+
+    a.Window("My App", 480, 300, func(ctx proton.Context) {
+        proton.Logo(ctx, 48, 48)
+        proton.Gap(ctx, 8)
+        proton.H4(ctx, "My App")
+    })
+    a.Run()
+}
+```
+
+Or load from a file path:
+
+```go
+a.SetLogo("assets/logo.png")
+```
+
+Both PNG and JPEG work. The image is decoded once and cached — never re-read per frame.
+
+---
+
+## Android
+
+Proton apps run on Android through Gio's native support. Same code, no rewrites.
+
+Install the build tool:
+
+```bash
+go install gioui.org/cmd/gogio@latest
+```
+
+Build an APK:
+
+```bash
+gogio -target android -appid com.yourname.yourapp .
+adb install yourapp.apk
+```
+
+Full setup guide: [docs/10-android.md](./docs/10-android.md)
+
+---
