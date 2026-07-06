@@ -1,51 +1,80 @@
 # Proton
 
+A GUI library for Go that doesn't make you want to switch to web dev.
+
+### Currently under development for v0.2.5
+
 [![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
 
-##### (Currently under development for v0.2.5)
-A GUI library for Go that doesn't make you want to switch to web dev. 
+## Our First Stargazers
 
-Built on [Gio](https://gioui.org). No C dependencies. Pure Go. Works on Linux, macOS, and Windows.
+Thank you to the early adopters who supported Proton from the very beginning!
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu</b><br />(First Stargazer)</sub></a></td>
+    <td align="center"><a href="https://github.com/bigwhite"><img src="https://github.com/bigwhite.png?size=100" width="100px;" alt=""/><br /><sub><b>@bigwhite</b></sub></a></td>
+    <td align="center"><a href="https://github.com/TanmayCzax"><img src="https://github.com/TanmayCzax.png?size=100" width="100px;" alt=""/><br /><sub><b>@TanmayCzax</b></sub></a></td>
+    <td align="center"><a href="https://github.com/aurax"><img src="https://github.com/aurax.png?size=100" width="100px;" alt=""/><br /><sub><b>@aurax</b></sub></a></td>
+    <td align="center"><a href="https://github.com/DemonK1"><img src="https://github.com/DemonK1.png?size=100" width="100px;" alt=""/><br /><sub><b>@DemonK1</b></sub></a></td>
+    <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a></td>
+    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube.png?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a></td>
+    <td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille.png?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a></td>
+    <td align="center"><a href="https://github.com/alanmsant2"><img src="https://github.com/alanmsant2.png?size=100" width="100px;" alt=""/><br /><sub><b>@alanmsant2</b></sub></a></td>
+  </tr>
+</table>
+
+## Documentation
+
+#### Official Docs: https://nexus-65.gitbook.io/proton
+
+#### Repo: https://github.com/CzaxStudio/proton-documentation
+
+---
+
+## Example apps
+
+### Note: I have created basic apps, you can create even better apps with Proton.
+
+<img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
+
+<img width="813" height="508" alt="Demo2" src="https://github.com/user-attachments/assets/af7552c4-107f-4760-835a-1ae736f49358" />
+
+## Logo
+
+<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/e044d0b8-a96f-4bc2-9df9-725a41a99ed2" />
+
+---
+
+# Getting Started
 
 ```go
 package main
 
 import "github.com/CzaxStudio/proton"
 
-type UI struct {
-    name proton.Editor
-    btn  proton.Clickable
-}
-
 func main() {
-    u := &UI{}
-    a := proton.New("my app")
-    a.ApplyPalette(proton.NordPalette)
-    a.Window("Hello", 480, 300, func(win proton.Context) {
-        proton.H3(win, "Hello from Proton!")
-        proton.Gap(win, 8)
-        proton.Input(win, &u.name, "Your name")
-        proton.Gap(win, 8)
-        if proton.Button(win, &u.btn, "Go") {
-            println("Hello,", u.name.Text())
-        }
+    a := proton.New("hello")
+    a.Window("Hello", 400, 200, func(ctx proton.Context) {
+        proton.H3(ctx, "Hello from Proton!")
     })
     a.Run()
 }
 ```
-## Our First Stargazers 
-Thank you to the early adopters who supported Proton from the very beginning! 
-<table>  <tr>    
-    <td align="center"><a href="https://github.com/VioGrafu"><img src="https://github.com/VioGrafu.png?size=100" width="100px;" alt=""/><br /><sub><b>@VioGrafu</b><br />(First Stargazer)</sub></a></td>    <td align="center"><a href="https://github.com/bigwhite"><img src="https://github.com/bigwhite.png?size=100" width="100px;" alt=""/><br /><sub><b>@bigwhite</b></sub></a></td>    <td align="center"><a href="https://github.com/TanmayCzax"><img src="https://github.com/TanmayCzax.png?size=100" width="100px;" alt=""/><br /><sub><b>@TanmayCzax</b></sub></a></td>    <td align="center"><a href="https://github.com/aurax"><img src="https://github.com/aurax.png?size=100" width="100px;" alt=""/><br /><sub><b>@aurax</b></sub></a></td>    <td align="center"><a href="https://github.com/DemonK1"><img src="https://github.com/DemonK1.png?size=100" width="100px;" alt=""/><br /><sub><b>@DemonK1</b></sub></a></td>    <td align="center"><a href="https://github.com/pekim"><img src="https://github.com/pekim.png?size=100" width="100px;" alt=""/><br /><sub><b>@pekim</b></sub></a></td>    <td align="center"><a href="https://github.com/fbaube"><img src="https://github.com/fbaube.png?size=100" width="100px;" alt=""/><br /><sub><b>@fbaube</b></sub></a></td>    <td align="center"><a href="https://github.com/gorilacrocodille"><img src="https://github.com/gorilacrocodille.png?size=100" width="100px;" alt=""/><br /><sub><b>@gorilacrocodille</b></sub></a></td>    <td align="center"><a href="https://github.com/alanmsant2"><img src="https://github.com/alanmsant2.png?size=100" width="100px;" alt=""/><br /><sub><b>@alanmsant2</b></sub></a></td>  </tr></table>
----
 
 ## Install
 
-```bash
+```
 go get github.com/CzaxStudio/proton
 ```
 
-**Linux** — three extra packages required:
+Then run once to pull Gio's dependencies:
+
+```
+go mod tidy
+```
+
+**Linux** — three system packages required:
 ```bash
 sudo apt install libwayland-dev libxkbcommon-dev libvulkan-dev
 ```
@@ -56,7 +85,7 @@ macOS and Windows need nothing extra.
 
 ## How it works
 
-Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct using Proton's re-exported types, so you only ever need one import.
+Your draw function runs every frame. Call widget functions in order — they stack vertically by default. State lives in your own struct. No `setState`, no component trees, no XML.
 
 ```go
 type UI struct {
@@ -80,7 +109,7 @@ type UI struct {
 `Button` `OutlineButton` `IconButton` `Tappable` `Link` `LinkSmall`
 
 ### Inputs
-`Input` `TextArea` `Checkbox` `Toggle` `RadioButton` `Slider` `ProgressBar` `NumberInput` `SelectBox`
+`Input` `TextArea` `Checkbox` `Toggle` `RadioButton` `Slider` `ProgressBar` `NumberInput` `SelectBox` `SearchInput`
 
 ### Lists
 `List` `HList` `Scroll` `TextView` `LogView`
@@ -92,7 +121,10 @@ type UI struct {
 
 ### Visual
 `Divider` `LabeledDivider` `Rect` `RoundRect` `Card` `HoverCard` `Badge` `StatusDot`
-`Image` `CodeBlock` `ShortcutHint` `ColorSwatch`
+`Avatar` `Tag` `Image` `Logo` `CodeBlock` `ShortcutHint` `ColorSwatch`
+
+### Data
+`Table` `ProgressRing` `Stepper`
 
 ### Feedback
 `Toast` `Alert` `AlertDismissable` `Tooltip` `Spinner`
@@ -107,136 +139,109 @@ type UI struct {
 
 ## Layout
 
-Widgets stack vertically by default. Use `Row` or `Column` to group them differently.
-
 ```go
 // side by side
-proton.Row(win,
-    func(win proton.Context) { proton.Label(win, "left") },
-    func(win proton.Context) { proton.Label(win, "right") },
+proton.Row(ctx,
+    func(ctx proton.Context) { proton.Label(ctx, "left") },
+    func(ctx proton.Context) { proton.Label(ctx, "right") },
 )
 
 // one child fills remaining space
-proton.GrowRow(win,
-    proton.FixedItem(win, func(win proton.Context) { proton.Label(win, "Search:") }),
-    proton.GrowItem(win, func(win proton.Context) { proton.Input(win, &e, "") }),
-    proton.FixedItem(win, func(win proton.Context) { proton.Button(win, &b, "Go") }),
+proton.GrowRow(ctx,
+    proton.FixedItem(ctx, func(ctx proton.Context) { proton.Label(ctx, "Search:") }),
+    proton.GrowItem(ctx, func(ctx proton.Context) { proton.Input(ctx, &e, "") }),
+    proton.FixedItem(ctx, func(ctx proton.Context) { proton.Button(ctx, &b, "Go") }),
 )
 
-// split pane (draggable)
-proton.ResizeSplit(win, &u.split, 0.35, leftFn, rightFn)
+// draggable split pane
+proton.ResizeSplit(ctx, &u.split, 0.35, leftFn, rightFn)
 
 // padding
-proton.Pad(win, 16, func(win proton.Context) { ... })
-proton.PadSides(win, 8, 16, 8, 16, func(win proton.Context) { ... })
+proton.Pad(ctx, 16, func(ctx proton.Context) { ... })
+proton.PadSides(ctx, 8, 16, 8, 16, func(ctx proton.Context) { ... })
 
-// blank gap
-proton.Gap(win, 12)
+// blank space
+proton.Gap(ctx, 12)
 ```
 
 ---
 
 ## Theming
 
-```go
-a.ApplyPalette(proton.DarkPalette)
-a.ApplyPalette(proton.NordPalette)
-a.ApplyPalette(proton.RosePinePalette)
-a.ApplyPalette(proton.CatppuccinPalette)
+46 built-in palettes. One line to apply any of them.
 
-// custom
+```go
+a.ApplyPalette(proton.NordPalette)
+a.ApplyPalette(proton.CatppuccinPalette)
+a.ApplyPalette(proton.DraculaPalette)
+a.ApplyPalette(proton.TokyoNightPalette)
+a.ApplyPalette(proton.GruvboxDarkPalette)
+a.ApplyPalette(proton.RosePinePalette)
+// ... 40 more
+```
+
+### Custom palette
+
+```go
 a.ApplyPalette(proton.Palette{
     Bg:        proton.RGB(0x1e1e2e),
     Fg:        proton.RGB(0xcdd6f4),
     Primary:   proton.RGB(0x89b4fa),
     PrimaryFg: proton.RGB(0x1e1e2e),
 })
+```
 
+### Hex color codes
+
+No structs needed — just pass the hex string:
+
+```go
+a.ThemeBuilder().
+    Bg("#1e1e2e").
+    Fg("#cdd6f4").
+    Primary("#89b4fa").
+    PrimaryFg("#1e1e2e").
+    Apply()
+
+// patch one color on the current theme
+a.ColorCode("primary", "#ff6b6b")
+a.ColorCode("bg", "#0d1117")
+```
+
+Accepted formats: `"#rrggbb"`, `"rrggbb"`, `"#rgb"`, `"#rrggbbaa"`.
+
+### Background colors
+
+```go
+a.SetBackgroundCode("#1a1b26")
+a.SetBackgroundRGB(26, 27, 38)
+a.SetBackgroundGradient("#1a1b26", "#2d1b69", "vertical")
+a.SetBackgroundRainbow() // animated full-spectrum gradient
+```
+
+### Font scale
+
+```go
 a.SetFontScale(1.1)
 ```
 
----
+### Live theme picker
 
-## Alerts and Feedback
+Drop into a settings window to let users switch themes at runtime:
 
 ```go
-proton.Alert(win, proton.AlertInfo,    "Informational message.")
-proton.Alert(win, proton.AlertSuccess, "Operation completed.")
-proton.Alert(win, proton.AlertWarning, "Proceed with caution.")
-proton.Alert(win, proton.AlertError,   "Something went wrong.")
-
-// dismissable
-if proton.AlertDismissable(win, &u.closeBtn, proton.AlertInfo, "Click × to close") {
-    u.showAlert = false
+type UI struct {
+    picker proton.ThemePickerState
 }
 
-// toast — call last in your draw function
-u.toast.Show("Saved!", 2*time.Second)
-proton.Toast(win, &u.toast)
+proton.ThemePicker(ctx, &u.picker, a)
 ```
-
----
-
-## Async updates
-
-```go
-go func() {
-    result := fetchFromAPI()
-    u.data = result
-    win.Invalidate() // ask for a redraw
-}()
-```
-
----
-
-## Keyboard shortcuts
-
-```go
-proton.OnKey(win, proton.ModCtrl, "S", func() { save() })
-proton.OnKey(win, proton.ModNone, proton.KeyEscape, func() { closeDialog() })
-```
-
----
-
-## Examples
-
-```bash
-go run ./examples/hello        # 7 lines, one window
-go run ./examples/todo         # classic todo list
-go run ./examples/calculator   # buttons and state
-go run ./examples/showcase     # layout and theming demo
-go run ./examples/kitchen      # every widget in one place
-```
-
----
-
-## Docs
-
-See the Docs for Detailed topics
-
-Getting started
-- Text
-- Buttons
-- Inputs
-- Layout
-- Lists
-- Visuals
-- Theming
-- Advanced
-- Examples
-- Android
-
----
-
-## License
-
-MIT
 
 ---
 
 ## Logo
 
-Load a logo once at startup and draw it anywhere:
+Load once at startup, draw anywhere.
 
 ```go
 //go:embed assets/logo.png
@@ -247,9 +252,11 @@ func main() {
     a.SetLogoBytes(logoBytes)
 
     a.Window("My App", 480, 300, func(ctx proton.Context) {
-        proton.Logo(ctx, 48, 48)
-        proton.Gap(ctx, 8)
-        proton.H4(ctx, "My App")
+        proton.Row(ctx,
+            func(ctx proton.Context) { proton.Logo(ctx, 40, 40) },
+            func(ctx proton.Context) { proton.Gap(ctx, 10) },
+            func(ctx proton.Context) { proton.H5(ctx, "My App") },
+        )
     })
     a.Run()
 }
@@ -261,27 +268,159 @@ Or load from a file path:
 a.SetLogo("assets/logo.png")
 ```
 
-Both PNG and JPEG work. The image is decoded once and cached — never re-read per frame.
+PNG and JPEG both work. The image is decoded once and cached — not re-read per frame.
+
+---
+
+## Alerts and Feedback
+
+```go
+proton.Alert(ctx, proton.AlertInfo,    "Informational message.")
+proton.Alert(ctx, proton.AlertSuccess, "Operation completed.")
+proton.Alert(ctx, proton.AlertWarning, "Proceed with caution.")
+proton.Alert(ctx, proton.AlertError,   "Something went wrong.")
+
+// dismissable
+if proton.AlertDismissable(ctx, &u.closeBtn, proton.AlertInfo, "Click x to close") {
+    u.showAlert = false
+}
+
+// toast — call last in your draw function
+u.toast.Show("Saved!", 2*time.Second)
+proton.Toast(ctx, &u.toast)
+```
+
+---
+
+## New in v0.2.x
+
+**Table**
+```go
+proton.Table(ctx,
+    []string{"Name", "Status", "Score"},
+    []proton.TableRow{
+        {"Alice", "Active", "98"},
+        {"Bob",   "Away",   "74"},
+    },
+)
+```
+
+**Stepper**
+```go
+proton.Stepper(ctx, currentStep, []string{"Build", "Test", "Stage", "Deploy"})
+```
+
+**ProgressRing**
+```go
+proton.ProgressRing(ctx, 0.72, 48, 5, proton.RGB(0x88c0d0))
+```
+
+**SearchInput**
+```go
+q := proton.SearchInput(ctx, &u.search, "Search notes...")
+```
+
+**Avatar**
+```go
+proton.Avatar(ctx, "AJ", proton.RGB(0x5e81ac), proton.RGB(0xeceff4), 40)
+```
+
+**NumberInput**
+```go
+qty := proton.NumberInput(ctx, &u.qty, 1, 99, 1)
+```
+
+**Overlay / modal**
+```go
+proton.Overlay(ctx, &u.modal, func(ctx proton.Context) {
+    proton.Card(ctx, proton.RGB(0x2e3440), 12, 24, func(ctx proton.Context) {
+        proton.H5(ctx, "Confirm?")
+        proton.Gap(ctx, 16)
+        proton.Pad(ctx, 4, func(ctx proton.Context) {
+            if proton.Button(ctx, &u.closeBtn, "Close") {
+                u.modal.Hide()
+            }
+        })
+    })
+})
+```
+
+---
+
+## Async Updates
+
+```go
+go func() {
+    result := fetchFromAPI()
+    u.data = result
+    ctx.Invalidate()
+}()
+```
+
+---
+
+## Keyboard Shortcuts
+
+```go
+proton.OnKey(ctx, proton.ModCtrl, "S", func() { save() })
+proton.OnKey(ctx, proton.ModNone, proton.KeyEscape, func() { closeDialog() })
+proton.OnKey(ctx, proton.ModCtrl|proton.ModShift, "N", func() { newWindow() })
+```
+
+---
+
+## Window Options
+
+```go
+a.WindowEx("App", 800, 600, []proton.WindowOption{
+    proton.Fullscreen(),
+}, draw)
+```
 
 ---
 
 ## Android
 
-Proton apps run on Android through Gio's native support. Same code, no rewrites.
-
-Install the build tool:
+Same code runs on Android. No rewrites.
 
 ```bash
 go install gioui.org/cmd/gogio@latest
-```
-
-Build an APK:
-
-```bash
 gogio -target android -appid com.yourname.yourapp .
 adb install yourapp.apk
 ```
 
-Full setup guide: 10-android.md
+Full guide: [docs/10-android.md](./docs/10-android.md)
 
 ---
+
+## API Immunity
+
+Every draw function takes `proton.Context` — an interface. No Gio types appear in the public API. If Gio's internals change in a future version, only Proton's implementation updates. Your code keeps compiling unchanged.
+
+```go
+func (app *MyApp) draw(ctx proton.Context) {
+    proton.Button(ctx, &app.btn, "Click")
+}
+```
+
+---
+
+## Examples
+
+```bash
+go run ./examples/hello        # minimal — one window, one label
+go run ./examples/todo         # todo list
+go run ./examples/calculator   # grid of buttons
+go run ./examples/notes        # note-taking app with search and split pane
+go run ./examples/dashboard    # dev dashboard with charts, logs, and tables
+go run ./examples/showcase     # every widget in one place
+go run ./examples/themes       # live theme picker
+go run ./examples/logoapp      # custom logo with go:embed
+go run ./examples/kitchen      # stress test for all features
+```
+
+---
+
+## License
+
+MIT
