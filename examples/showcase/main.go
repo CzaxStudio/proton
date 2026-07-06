@@ -1,5 +1,4 @@
-// showcase — a live widget gallery that exercises every widget in Proton.
-// Run this to visually confirm that everything works.
+
 package main
 
 import (
