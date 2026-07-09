@@ -389,7 +389,7 @@ gogio -target android -appid com.yourname.yourapp .
 adb install yourapp.apk
 ```
 
-Full guide: [docs/10-android.md](./docs/10-android.md)
+Full guide: [docs/10-android.md](https://github.com/CzaxStudio/proton-documentation/blob/main/docs/10-android.md)
 
 ---
 
