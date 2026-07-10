@@ -41,7 +41,7 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 ## Example apps
 
-### Note: I have created basic apps, you can create even better apps with Proton.
+**You can create even better! Proton is not just for Todo or Calculator apps**
 
 <img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
 
