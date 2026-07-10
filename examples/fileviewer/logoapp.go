@@ -12,7 +12,7 @@ import (
 // Drop any PNG/JPEG into the same folder as main.go, rename it logo.png,
 // and this line will include it in the binary automatically.
 //
-//go:embed Panther.png
+//go:embed logo.png
 var logoBytes []byte
 
 type ui struct {
@@ -29,7 +29,7 @@ func main() {
 	u := &ui{}
 
 	gApp = proton.New("logoapp")
-	gApp.ApplyPalette(proton.NordPalette)
+	gApp.ApplyPalette(proton.CarbonPalette)
 
 	// Load the embedded logo once. If it fails (e.g. logo.png is missing),
 	// the app still runs — Logo() just draws nothing.
@@ -38,7 +38,7 @@ func main() {
 		println("logo load failed:", err.Error())
 	}
 
-	gApp.Window("My App", 480, 520, func(ctx proton.Context) {
+	gApp.Window("LogoIntroduced!", 480, 520, func(ctx proton.Context) {
 		draw(ctx, u)
 	})
 	gApp.Run()
@@ -59,7 +59,7 @@ func draw(ctx proton.Context, u *ui) {
 				func(ctx proton.Context) { proton.Gap(ctx, 14) },
 				func(ctx proton.Context) {
 					proton.Column(ctx,
-						func(ctx proton.Context) { proton.H4(ctx, "My App") },
+						func(ctx proton.Context) { proton.H4(ctx, "Click it") },
 						func(ctx proton.Context) { proton.Gap(ctx, 2) },
 						func(ctx proton.Context) { proton.Muted(ctx, "Built with Proton") },
 					)
