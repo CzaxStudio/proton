@@ -33,9 +33,9 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 ## Documentation
 
-#### Official Docs: https://nexus-65.gitbook.io/proton
+**[Official Docs For Proton](https://nexus-65.gitbook.io/proton)**
 
-#### Repo: https://github.com/CzaxStudio/proton-documentation
+**[Docs Repo Repo](https://github.com/CzaxStudio/proton-documentation)**
 
 ---
 
