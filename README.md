@@ -58,7 +58,8 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 ## Logo
 
-<img width="1254" height="1254" alt="Proton" src="https://github.com/user-attachments/assets/e044d0b8-a96f-4bc2-9df9-725a41a99ed2" />
+<img width="1254" height="1254" alt="ChatGPT Image Jul 10, 2026, 01_09_19 PM" src="https://github.com/user-attachments/assets/750a0671-1527-488e-851f-8c1f38f39128" />
+
 
 ---
 
