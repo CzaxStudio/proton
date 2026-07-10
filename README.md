@@ -2,9 +2,14 @@
 
 A GUI library for Go that doesn't make you want to switch to web dev.
 
-### Currently under development for v0.2.5
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/CzaxStudio/proton)](https://goreportcard.com/report/github.com/CzaxStudio/proton) [![Mentioned in Awesome Go](https://awesome.re/mentioned-badge.svg)](https://github.com/avelino/awesome-go)
+
+## Why Proton?
+**Zero CGO Required: Cross-compile to Windows and macOS flawlessly from any machine without fighting external compiler toolchains.**
+
+**Pure Go Ecosystem: Built on top of Gio, maintaining a 100% Go native development experience.**
+
+**API Immunity: No raw Gio types pollute your code. If the underlying rendering engine updates, your app's codebase remains completely untouched.**
 
 ## Our First Stargazers
 
@@ -23,6 +28,8 @@ Thank you to the early adopters who supported Proton from the very beginning!
     <td align="center"><a href="https://github.com/alanmsant2"><img src="https://github.com/alanmsant2.png?size=100" width="100px;" alt=""/><br /><sub><b>@alanmsant2</b></sub></a></td>
   </tr>
 </table>
+
+
 
 ## Documentation
 
@@ -424,3 +431,5 @@ go run ./examples/kitchen      # stress test for all features
 ## License
 
 MIT
+
+**Currently under development for v0.2.5**
