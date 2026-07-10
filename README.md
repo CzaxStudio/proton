@@ -54,7 +54,8 @@ Thank you to the early adopters who supported Proton from the very beginning!
 <img width="471" height="542" alt="Sample2" src="https://github.com/user-attachments/assets/77bc7ba2-c06b-4c58-805f-574d1952cd57" />
 
 <img width="1366" height="729" alt="Sample1" src="https://github.com/user-attachments/assets/13e6880b-e378-457e-b717-9b3953e6ea06" />
-[Code](https://github.com/CzaxStudio/proton/blob/main/examples/dashboard/main.go)
+
+**[Code](https://github.com/CzaxStudio/proton/blob/main/examples/dashboard/main.go)**
 
 
 ## Logo
