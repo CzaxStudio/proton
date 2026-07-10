@@ -41,11 +41,20 @@ Thank you to the early adopters who supported Proton from the very beginning!
 
 ## Example apps
 
+### GIF
+
 **You can create even better! Proton is not just for Todo or Calculator apps**
 
 <img width="813" height="508" alt="GUI demo" src="https://github.com/user-attachments/assets/c8e48374-7e98-41c5-9d46-4427a007b02b" />
 
 <img width="813" height="508" alt="Demo2" src="https://github.com/user-attachments/assets/af7552c4-107f-4760-835a-1ae736f49358" />
+
+### Pictures
+
+[Sample Image](<img width="471" height="542" alt="Sample2" src="https://github.com/user-attachments/assets/77bc7ba2-c06b-4c58-805f-574d1952cd57" />)
+
+[Sample Image](<img width="1366" height="729" alt="Sample1" src="https://github.com/user-attachments/assets/13e6880b-e378-457e-b717-9b3953e6ea06" />)
+
 
 ## Logo
 
