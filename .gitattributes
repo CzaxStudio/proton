@@ -1,2 +1,2 @@
 *.md linguist-detectable=true
-
+*.txt linguist-detectable=true
