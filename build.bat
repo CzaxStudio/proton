@@ -1,4 +1,5 @@
 @echo off
+echo This is a test file.....
 set APP_NAME=ProtonCyberTool
 set SRC_PATH=.\examples\cybertool\main.go
 set OUT_DIR=.\build
