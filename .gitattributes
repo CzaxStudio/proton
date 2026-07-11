@@ -1,3 +1,5 @@
-*.md linguist-detectable=true
+
 *.txt linguist-detectable=true
+*.md linguist-detectable=true
 *.mod linguist-detectable=true
+*.sum linguist-detectable=true
