@@ -1,5 +1,7 @@
 *.txt linguist-detectable=true
-*.md  linguist-detectable=true
+*.md linguist-language=Markdown
+*.md linguist-detectable=true
+*.md linguist-documentation=false
 *.mod linguist-detectable=true
 *.sum linguist-detectable=true
 
