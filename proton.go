@@ -361,3 +361,4 @@ func RGBA(r, g, b, a uint8) color.NRGBA {
 func HexColor(code string) color.NRGBA {
 	return parseHex(code)
 }
+// Code explanation credit: Robert Carpenter
