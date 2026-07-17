@@ -444,4 +444,4 @@ go run ./examples/kitchen      # stress test for all features
 
 MIT
 
-**Currently under development for v0.2.5**
+**Currently under development for v0.4.0**
