@@ -269,9 +269,6 @@ type Context interface {
 
 type gioWidget = func(gtx layout.Context) layout.Dimensions
 
-// winImpl is the unexported concrete implementation of Context.
-// We reuse the widgets slice by capping it — this avoids the most
-// common allocation hot-spot (growing the slice every frame).
 type winImpl struct {
 	th      *material.Theme
 	win     *app.Window
@@ -320,9 +317,6 @@ func (c *winImpl) run(gtx layout.Context) layout.Dimensions {
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, children...)
 }
 
-// child creates a nested Context, calls fn to collect its widgets, then
-// returns a gioWidget that lays them out during Gio's live layout pass.
-// Uses the pool to avoid per-call heap allocations.
 func child(parent Context, fn func(Context)) gioWidget {
 	return func(gtx layout.Context) layout.Dimensions {
 		c := implPool.Get().(*winImpl)
@@ -349,4 +343,3 @@ func RGBA(r, g, b, a uint8) color.NRGBA { return color.NRGBA{R: r, G: g, B: b, A
 
 // HexColor parses a CSS hex string. Accepts "#rrggbb", "rrggbb", "#rgb", "#rrggbbaa".
 func HexColor(code string) color.NRGBA { return parseHex(code) }
-// Code explanation credit: Robert Carpenter
