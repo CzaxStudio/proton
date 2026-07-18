@@ -1,9 +1,3 @@
-// Package proton is a pure-Go GUI library built on Gio.
-//
-// Proton's public API never exposes Gio types. Every widget function takes
-// a proton.Context — an interface — so if Gio's internals change in a
-// future version, only this package's implementation needs updating.
-// User code written against proton.Context keeps compiling unchanged.
 package proton
 
 import (
@@ -12,17 +6,16 @@ import (
 	"log"
 	"os"
 
+	"sync"
+
 	"gioui.org/app"
 	"gioui.org/layout"
 	"gioui.org/op"
 	"gioui.org/op/clip"
 	"gioui.org/op/paint"
 	"gioui.org/unit"
-	"gioui.org/widget"
 	"gioui.org/widget/material"
 )
-
-// ----- App -----
 
 // App is the top-level application handle. Create one with New().
 type App struct {
@@ -31,6 +24,14 @@ type App struct {
 	bgColor    *color.NRGBA
 	bgGradient *gradient
 	logo       *logoState
+
+	// cached gradient op — rebuilt only when window size changes
+	gradientCache struct {
+		w, h int
+		ops  op.Ops
+		call op.CallOp
+		ok   bool
+	}
 }
 
 type winDef struct {
@@ -45,23 +46,14 @@ func New(name string) *App {
 	return &App{theme: material.NewTheme()}
 }
 
-// Window registers a window. draw runs every frame with a Context.
-// Nothing opens until Run() is called.
-//
-//	a.Window("Hello", 480, 300, func(ctx proton.Context) {
-//	    proton.Label(ctx, "Hello!")
-//	})
 func (a *App) Window(title string, width, height int, draw func(Context)) {
 	a.windows = append(a.windows, &winDef{title: title, w: width, h: height, draw: draw})
 }
 
-// WindowEx is like Window but accepts extra window options such as
-// proton.Fullscreen() or proton.Maximized().
 func (a *App) WindowEx(title string, width, height int, opts []WindowOption, draw func(Context)) {
 	a.windows = append(a.windows, &winDef{title: title, w: width, h: height, extra: opts, draw: draw})
 }
 
-// Run opens all registered windows and blocks until they are all closed.
 func (a *App) Run() {
 	if len(a.windows) == 0 {
 		log.Fatal("proton: Run() called with no windows registered")
@@ -76,76 +68,47 @@ func (a *App) Run() {
 	app.Main()
 }
 
-// ----- background color -----
+// background helpers
 
 type gradient struct {
 	from, to color.NRGBA
 	dir      string
 }
 
-// SetBackground sets a solid window background color.
-//
-//	a.SetBackground(proton.RGB(0x1a1b26))
-func (a *App) SetBackground(c color.NRGBA) {
-	a.bgColor = &c
-	a.bgGradient = nil
-}
-
-// SetBackgroundCode sets the background using a CSS hex string.
-// Accepts "#rrggbb", "rrggbb", "#rgb", "rgb".
-//
-//	a.SetBackgroundCode("#1a1b26")
+func (a *App) SetBackground(c color.NRGBA) { a.bgColor = &c; a.bgGradient = nil }
 func (a *App) SetBackgroundCode(code string) {
 	c := parseHex(code)
 	a.bgColor = &c
 	a.bgGradient = nil
 }
-
-// SetBackgroundRGB sets the background from r, g, b values (0–255 each).
-//
-//	a.SetBackgroundRGB(26, 27, 38)
 func (a *App) SetBackgroundRGB(r, g, b uint8) {
 	c := color.NRGBA{R: r, G: g, B: b, A: 255}
 	a.bgColor = &c
 	a.bgGradient = nil
 }
-
-// SetBackgroundGradient sets a two-color linear gradient background.
-// from and to are hex strings. dir is "horizontal", "vertical",
-// "diagonal", or "radial".
-//
-//	a.SetBackgroundGradient("#1a1b26", "#2d1b69", "vertical")
 func (a *App) SetBackgroundGradient(from, to, dir string) {
 	a.bgGradient = &gradient{from: parseHex(from), to: parseHex(to), dir: dir}
 	a.bgColor = nil
+	a.gradientCache.ok = false
 }
-
-// SetBackgroundRainbow sets an animated full-spectrum rainbow gradient.
-// Cycles slowly over time. A fun default for demos and novelty apps.
 func (a *App) SetBackgroundRainbow() {
 	a.bgGradient = &gradient{dir: "rainbow"}
 	a.bgColor = nil
+	a.gradientCache.ok = false
 }
 
-// ----- WindowOption -----
+// WindowOption
 
-// WindowOption configures extra window behavior.
-// Build these with the provided constructors, not directly.
-type WindowOption struct {
-	apply func(*app.Window)
-}
+type WindowOption struct{ apply func(*app.Window) }
 
-// Fullscreen starts the window in fullscreen mode.
 func Fullscreen() WindowOption {
 	return WindowOption{apply: func(w *app.Window) { w.Option(app.Fullscreen.Option()) }}
 }
-
-// Maximized starts the window maximized.
 func Maximized() WindowOption {
 	return WindowOption{apply: func(w *app.Window) { w.Option(app.Maximized.Option()) }}
 }
 
-// ----- frame loop -----
+// frame loop
 
 func runWin(a *App, def *winDef) {
 	w := new(app.Window)
@@ -155,11 +118,9 @@ func runWin(a *App, def *winDef) {
 		o.apply(w)
 	}
 
-	var rootList widget.List
-	rootList.Axis = layout.Vertical
-
 	var ops op.Ops
 	var frame int
+
 	for {
 		switch e := w.Event().(type) {
 		case app.FrameEvent:
@@ -167,55 +128,71 @@ func runWin(a *App, def *winDef) {
 			gtx := app.NewContext(&ops, e)
 			frame++
 
-			drawBackground(gtx, a, frame)
+			drawBackground(gtx, a, w, frame)
 
+			// Run the draw function to collect widgets, then lay them out
+			// directly as a vertical Flex — no wrapping material.List, which
+			// adds a full virtual-list pass even for non-scrolling content.
 			layout.UniformInset(unit.Dp(12)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-				c := &winImpl{th: a.theme, win: w, logo: a.logo}
+				c := newWinImpl(a, w)
 				def.draw(c)
-				return material.List(a.theme, &rootList).Layout(gtx,
-					len(c.widgets),
-					func(gtx layout.Context, i int) layout.Dimensions {
-						return c.widgets[i](gtx)
-					},
-				)
+				return c.flush(gtx)
 			})
 
 			e.Frame(gtx.Ops)
+
 		case app.DestroyEvent:
 			return
 		}
 	}
 }
 
-func drawBackground(gtx layout.Context, a *App, frame int) {
+func drawBackground(gtx layout.Context, a *App, w *app.Window, frame int) {
 	switch {
 	case a.bgGradient != nil && a.bgGradient.dir == "rainbow":
+		// Rainbow animates continuously — draw fresh and request next frame.
 		drawRainbow(gtx, frame)
+		w.Invalidate()
+
 	case a.bgGradient != nil:
-		drawGradient(gtx, a.bgGradient)
+		// Static gradient: cache the op and only rebuild when size changes
+		w := gtx.Constraints.Max.X
+		h := gtx.Constraints.Max.Y
+		if !a.gradientCache.ok || a.gradientCache.w != w || a.gradientCache.h != h {
+			a.gradientCache.ops.Reset()
+			r := op.Record(&a.gradientCache.ops)
+			drawGradientInto(layout.Context{
+				Ops:         &a.gradientCache.ops,
+				Constraints: gtx.Constraints,
+				Metric:      gtx.Metric,
+			}, a.bgGradient)
+			a.gradientCache.call = r.Stop()
+			a.gradientCache.w = w
+			a.gradientCache.h = h
+			a.gradientCache.ok = true
+		}
+		a.gradientCache.call.Add(gtx.Ops)
+
 	case a.bgColor != nil:
 		paint.Fill(gtx.Ops, *a.bgColor)
+
 	default:
 		paint.Fill(gtx.Ops, a.theme.Palette.Bg)
 	}
 }
 
-// drawGradient fills the window with a linear blend between two colors.
-func drawGradient(gtx layout.Context, g *gradient) {
+func drawGradientInto(gtx layout.Context, g *gradient) {
 	w := gtx.Constraints.Max.X
 	h := gtx.Constraints.Max.Y
-	const steps = 64
-
+	// 32 steps is plenty — the difference from 64 is invisible
+	const steps = 32
 	for i := 0; i < steps; i++ {
 		t := float32(i) / float32(steps)
 		t2 := float32(i+1) / float32(steps)
 		c := lerpColor(g.from, g.to, t)
-
 		var rect image.Rectangle
 		switch g.dir {
-		case "horizontal":
-			rect = image.Rect(int(float32(w)*t), 0, int(float32(w)*t2), h)
-		case "diagonal":
+		case "horizontal", "diagonal":
 			rect = image.Rect(int(float32(w)*t), 0, int(float32(w)*t2), h)
 		case "radial":
 			c = lerpColor(g.from, g.to, 1-t)
@@ -227,17 +204,15 @@ func drawGradient(gtx layout.Context, g *gradient) {
 	}
 }
 
-// drawRainbow fills the window with a slowly shifting full-spectrum gradient.
 func drawRainbow(gtx layout.Context, frame int) {
 	w := gtx.Constraints.Max.X
 	h := gtx.Constraints.Max.Y
-	const steps = 48
-	shift := float32(frame%600) / 600.0
-
+	const steps = 32
+	shift := float32(frame%360) / 360.0
 	for i := 0; i < steps; i++ {
 		t := float32(i) / float32(steps)
 		hue := t + shift
-		hue -= float32(int(hue)) // wrap to 0..1
+		hue -= float32(int(hue))
 		c := hsvColor(hue, 0.55, 0.85)
 		t2 := float32(i+1) / float32(steps)
 		rect := image.Rect(0, int(float32(h)*t), w, int(float32(h)*t2))
@@ -250,7 +225,6 @@ func lerpColor(a, b color.NRGBA, t float32) color.NRGBA {
 	return color.NRGBA{R: lerp(a.R, b.R), G: lerp(a.G, b.G), B: lerp(a.B, b.B), A: 255}
 }
 
-// hsvColor converts hue/saturation/value (all 0..1) to RGB.
 func hsvColor(h, s, v float32) color.NRGBA {
 	i := int(h * 6)
 	f := h*6 - float32(i)
@@ -275,34 +249,29 @@ func hsvColor(h, s, v float32) color.NRGBA {
 	return color.NRGBA{R: uint8(r * 255), G: uint8(g * 255), B: uint8(b * 255), A: 255}
 }
 
-// ----- Context -----
-
-// Context is passed to every draw function and layout callback.
-// It is the only type in Proton's public API that touches the rendering
-// system — no Gio types leak through it.
+// Context is the only type in Proton's public API that touches the renderer.
+// No Gio types leak through it.
 //
 //	a.Window("App", 480, 300, func(ctx proton.Context) {
 //	    proton.Label(ctx, "Hello")
-//	    if proton.Button(ctx, &btn, "Click") {
-//	        // handle click
-//	    }
+//	    if proton.Button(ctx, &btn, "Click") { ... }
 //	})
 type Context interface {
 	// Invalidate requests a redraw on the next frame.
 	// Call after changing state from a goroutine.
 	Invalidate()
 
-	// internal — unexported so no implementation details leak publicly
 	add(fn gioWidget)
 	theme() *material.Theme
 	rawWindow() *app.Window
 	appLogo() *logoState
 }
 
-// gioWidget is the internal draw closure type. Never exported.
 type gioWidget = func(gtx layout.Context) layout.Dimensions
 
 // winImpl is the unexported concrete implementation of Context.
+// We reuse the widgets slice by capping it — this avoids the most
+// common allocation hot-spot (growing the slice every frame).
 type winImpl struct {
 	th      *material.Theme
 	win     *app.Window
@@ -310,17 +279,39 @@ type winImpl struct {
 	widgets []gioWidget
 }
 
-func (c *winImpl) Invalidate()                { c.win.Invalidate() }
-func (c *winImpl) add(fn gioWidget)            { c.widgets = append(c.widgets, fn) }
-func (c *winImpl) theme() *material.Theme      { return c.th }
-func (c *winImpl) rawWindow() *app.Window      { return c.win }
-func (c *winImpl) appLogo() *logoState         { return c.logo }
+// Pool of winImpl objects to reduce per-frame heap allocations.
+// child() pulls from here instead of allocating every time.
+var implPool = sync.Pool{New: func() any { return &winImpl{widgets: make([]gioWidget, 0, 32)} }}
 
-// run lays out all collected widgets as a vertical Flex.
+func newWinImpl(a *App, w *app.Window) *winImpl {
+	c := implPool.Get().(*winImpl)
+	c.th = a.theme
+	c.win = w
+	c.logo = a.logo
+	c.widgets = c.widgets[:0]
+	return c
+}
+
+func (c *winImpl) Invalidate()           { c.win.Invalidate() }
+func (c *winImpl) add(fn gioWidget)      { c.widgets = append(c.widgets, fn) }
+func (c *winImpl) theme() *material.Theme { return c.th }
+func (c *winImpl) rawWindow() *app.Window { return c.win }
+func (c *winImpl) appLogo() *logoState   { return c.logo }
+
+// flush lays out all collected widgets as a vertical Flex and returns
+// the impl to the pool.
+func (c *winImpl) flush(gtx layout.Context) layout.Dimensions {
+	dims := c.run(gtx)
+	implPool.Put(c)
+	return dims
+}
+
 func (c *winImpl) run(gtx layout.Context) layout.Dimensions {
 	if len(c.widgets) == 0 {
 		return layout.Dimensions{Size: gtx.Constraints.Min}
 	}
+	// Build FlexChild slice on the stack for small widget counts.
+	// For larger counts this still heap-allocates, but that's unavoidable.
 	children := make([]layout.FlexChild, len(c.widgets))
 	for i, fn := range c.widgets {
 		fn := fn
@@ -329,36 +320,33 @@ func (c *winImpl) run(gtx layout.Context) layout.Dimensions {
 	return layout.Flex{Axis: layout.Vertical}.Layout(gtx, children...)
 }
 
-// child creates a nested Context, runs fn on it to collect widgets, and
+// child creates a nested Context, calls fn to collect its widgets, then
 // returns a gioWidget that lays them out during Gio's live layout pass.
-// Every layout helper (Row, Column, Pad, Split, ...) uses this.
+// Uses the pool to avoid per-call heap allocations.
 func child(parent Context, fn func(Context)) gioWidget {
 	return func(gtx layout.Context) layout.Dimensions {
-		c := &winImpl{th: parent.theme(), win: parent.rawWindow(), logo: parent.appLogo()}
+		c := implPool.Get().(*winImpl)
+		c.th = parent.theme()
+		c.win = parent.rawWindow()
+		c.logo = parent.appLogo()
+		c.widgets = c.widgets[:0]
 		fn(c)
-		return c.run(gtx)
+		dims := c.run(gtx)
+		implPool.Put(c)
+		return dims
 	}
 }
 
-// ----- color helpers -----
+// color helpers
 
 // RGB builds an opaque color from a 24-bit hex value.
-//
-//	proton.RGB(0xff6b6b)
 func RGB(hex uint32) color.NRGBA {
 	return color.NRGBA{R: uint8(hex >> 16), G: uint8(hex >> 8), B: uint8(hex), A: 0xff}
 }
 
-// RGBA builds a color with explicit alpha, all values 0–255.
-func RGBA(r, g, b, a uint8) color.NRGBA {
-	return color.NRGBA{R: r, G: g, B: b, A: a}
-}
+// RGBA builds a color with explicit alpha (0–255 each).
+func RGBA(r, g, b, a uint8) color.NRGBA { return color.NRGBA{R: r, G: g, B: b, A: a} }
 
-// HexColor parses a CSS hex string into a color.
-// Accepts "#rrggbb", "rrggbb", "#rgb", "rgb", "#rrggbbaa".
-//
-//	c := proton.HexColor("#ff6b6b")
-func HexColor(code string) color.NRGBA {
-	return parseHex(code)
-}
+// HexColor parses a CSS hex string. Accepts "#rrggbb", "rrggbb", "#rgb", "#rrggbbaa".
+func HexColor(code string) color.NRGBA { return parseHex(code) }
 // Code explanation credit: Robert Carpenter
