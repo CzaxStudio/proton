@@ -34,14 +34,14 @@ type TabState struct {
 // Clickable per tab. content is called with the selected tab index.
 //
 //	proton.Tabs(win, []string{"Files", "Settings"}, u.tabBtns[:], &u.tabs,
-//	    func(win *proton.Win, i int) {
+//	    func(win proton.Context, i int) {
 //	        switch i {
 //	        case 0: drawFiles(win)
 //	        case 1: drawSettings(win)
 //	        }
 //	    },
 //	)
-func Tabs(win *Win, labels []string, btns []Clickable, state *TabState, content func(*Win, int)) {
+func Tabs(win Context, labels []string, btns []Clickable, state *TabState, content func(Context, int)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
@@ -57,12 +57,12 @@ func Tabs(win *Win, labels []string, btns []Clickable, state *TabState, content 
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 								return btns[i].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 									return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-										lbl := material.Body2(win.th, label)
+										lbl := material.Body2(win.theme(), label)
 										if active {
-											lbl.Color = win.th.Palette.ContrastBg
+											lbl.Color = win.theme().Palette.ContrastBg
 											lbl.Font.Weight = 500
 										} else {
-											c := win.th.Palette.Fg
+											c := win.theme().Palette.Fg
 											c.A = 150
 											lbl.Color = c
 										}
@@ -76,7 +76,7 @@ func Tabs(win *Win, labels []string, btns []Clickable, state *TabState, content 
 								}
 								h := gtx.Dp(unit.Dp(2))
 								w := gtx.Constraints.Max.X
-								paint.FillShape(gtx.Ops, win.th.Palette.ContrastBg,
+								paint.FillShape(gtx.Ops, win.theme().Palette.ContrastBg,
 									clip.Rect{Max: image.Pt(w, h)}.Op())
 								return layout.Dimensions{Size: image.Pt(w, h)}
 							}),
@@ -88,14 +88,14 @@ func Tabs(win *Win, labels []string, btns []Clickable, state *TabState, content 
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				h := gtx.Dp(unit.Dp(1))
 				w := gtx.Constraints.Max.X
-				c := win.th.Palette.Fg
+				c := win.theme().Palette.Fg
 				c.A = 35
 				paint.FillShape(gtx.Ops, c, clip.Rect{Max: image.Pt(w, h)}.Op())
 				return layout.Dimensions{Size: image.Pt(w, h)}
 			}),
 			layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 				return layout.UniformInset(unit.Dp(12)).Layout(gtx,
-					child(win, func(w *Win) { content(w, state.Selected) }))
+					child(win, func(w Context) { content(w, state.Selected) }))
 			}),
 		)
 	})
@@ -115,10 +115,10 @@ type AccordionState struct {
 
 // Accordion draws a collapsible section with a clickable header.
 //
-//	proton.Accordion(win, &u.sec1, &u.sec1btn, "Advanced", func(win *proton.Win) {
+//	proton.Accordion(win, &u.sec1, &u.sec1btn, "Advanced", func(win proton.Context) {
 //	    proton.Label(win, "Hidden until expanded.")
 //	})
-func Accordion(win *Win, state *AccordionState, btn *Clickable, title string, content func(*Win)) {
+func Accordion(win Context, state *AccordionState, btn *Clickable, title string, content func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		if btn.Clicked(gtx) {
 			state.Open = !state.Open
@@ -135,7 +135,7 @@ func Accordion(win *Win, state *AccordionState, btn *Clickable, title string, co
 								return layout.Spacer{Width: unit.Dp(8)}.Layout(gtx)
 							}),
 							layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
-								lbl := material.Body1(win.th, title)
+								lbl := material.Body1(win.theme(), title)
 								lbl.Font.Weight = 500
 								return lbl.Layout(gtx)
 							}),
@@ -155,9 +155,9 @@ func Accordion(win *Win, state *AccordionState, btn *Clickable, title string, co
 }
 
 // drawChevron draws a small triangle pointing right (collapsed) or down (open).
-func drawChevron(gtx layout.Context, win *Win, open bool) layout.Dimensions {
+func drawChevron(gtx layout.Context, win Context, open bool) layout.Dimensions {
 	sz := gtx.Dp(unit.Dp(8))
-	c := win.th.Palette.Fg
+	c := win.theme().Palette.Fg
 	c.A = 180
 	var path clip.Path
 	path.Begin(gtx.Ops)
@@ -189,7 +189,7 @@ type SpinnerState struct {
 }
 
 // Spinner draws an animated circular loading indicator. sizeDp is the diameter.
-func Spinner(win *Win, state *SpinnerState, sizeDp float32) {
+func Spinner(win Context, state *SpinnerState, sizeDp float32) {
 	if state.start.IsZero() {
 		state.start = time.Now()
 	}
@@ -204,7 +204,7 @@ func Spinner(win *Win, state *SpinnerState, sizeDp float32) {
 		strokeW := cx * 0.13
 
 		// background ring
-		bgC := win.th.Palette.Fg
+		bgC := win.theme().Palette.Fg
 		bgC.A = 30
 		steps := 48
 		for i := 0; i < steps; i++ {
@@ -222,7 +222,7 @@ func Spinner(win *Win, state *SpinnerState, sizeDp float32) {
 		}
 
 		// arc (~75% of circle)
-		arcC := win.th.Palette.ContrastBg
+		arcC := win.theme().Palette.ContrastBg
 		arcSteps := int(float32(steps) * 0.75)
 		for i := 0; i < arcSteps; i++ {
 			frac := float32(i) / float32(arcSteps)
@@ -263,7 +263,7 @@ type SelectBoxState struct {
 }
 
 // SelectBox draws a dropdown selector. Returns the index of the selected option.
-func SelectBox(win *Win, state *SelectBoxState, options []string) int {
+func SelectBox(win Context, state *SelectBoxState, options []string) int {
 	for len(state.rowBtns) < len(options) {
 		state.rowBtns = append(state.rowBtns, widget.Clickable{})
 	}
@@ -286,9 +286,9 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 
 		// header button
 		headerDims := state.mainBtn.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			bg := win.th.Palette.Fg
+			bg := win.theme().Palette.Fg
 			bg.A = 18
-			border := win.th.Palette.Fg
+			border := win.theme().Palette.Fg
 			border.A = 55
 			return layout.Stack{}.Layout(gtx,
 				layout.Expanded(func(gtx layout.Context) layout.Dimensions {
@@ -309,7 +309,7 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 				layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 					return layout.UniformInset(unit.Dp(9)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 						return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
-							layout.Flexed(1, material.Body1(win.th, label).Layout),
+							layout.Flexed(1, material.Body1(win.theme(), label).Layout),
 							layout.Rigid(func(gtx layout.Context) layout.Dimensions {
 								return drawChevron(gtx, win, state.Open)
 							}),
@@ -326,9 +326,9 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 		// draw dropdown below header
 		rowH := gtx.Dp(unit.Dp(36))
 		totalH := rowH * len(options)
-		bg := win.th.Palette.Fg
+		bg := win.theme().Palette.Fg
 		bg.A = 18
-		border := win.th.Palette.Fg
+		border := win.theme().Palette.Fg
 		border.A = 55
 
 		macro := op.Record(gtx.Ops)
@@ -340,7 +340,7 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 			Rect: image.Rect(0, 0, headerDims.Size.X, totalH),
 			NW:   0, NE: 0, SE: r, SW: r,
 		}
-		paint.FillShape(gtx.Ops, win.th.Palette.Bg,
+		paint.FillShape(gtx.Ops, win.theme().Palette.Bg,
 			clip.Rect{Max: image.Pt(headerDims.Size.X, totalH)}.Op())
 		paint.FillShape(gtx.Ops, bg, dropRect.Op(gtx.Ops))
 		paint.FillShape(gtx.Ops, border,
@@ -353,10 +353,10 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 				return state.rowBtns[i].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					rowBg := color.NRGBA{}
 					if i == state.Selected {
-						rowBg = win.th.Palette.ContrastBg
+						rowBg = win.theme().Palette.ContrastBg
 						rowBg.A = 50
 					} else if state.rowBtns[i].Hovered() {
-						rowBg = win.th.Palette.Fg
+						rowBg = win.theme().Palette.Fg
 						rowBg.A = 20
 					}
 					return layout.Stack{}.Layout(gtx,
@@ -371,7 +371,7 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 						}),
 						layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 							return layout.UniformInset(unit.Dp(9)).Layout(gtx,
-								material.Body1(win.th, opt).Layout)
+								material.Body1(win.theme(), opt).Layout)
 						}),
 					)
 				})
@@ -400,9 +400,9 @@ func SelectBox(win *Win, state *SelectBoxState, options []string) int {
 //
 //	proton.LabeledDivider(win, "Advanced Settings")
 //	proton.LabeledDivider(win, "")
-func LabeledDivider(win *Win, label string) {
+func LabeledDivider(win Context, label string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		c := win.th.Palette.Fg
+		c := win.theme().Palette.Fg
 		c.A = 55
 		if label == "" {
 			h := gtx.Dp(unit.Dp(1))
@@ -410,7 +410,7 @@ func LabeledDivider(win *Win, label string) {
 			paint.FillShape(gtx.Ops, c, clip.Rect{Max: image.Pt(w, h)}.Op())
 			return layout.Dimensions{Size: image.Pt(w, h)}
 		}
-		lbl := material.Caption(win.th, label)
+		lbl := material.Caption(win.theme(), label)
 		lbl.Color = c
 		return layout.Flex{Axis: layout.Horizontal, Alignment: layout.Middle}.Layout(gtx,
 			layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
@@ -439,12 +439,12 @@ func LabeledDivider(win *Win, label string) {
 // All layers share the same available space.
 //
 //	proton.ZStack(win,
-//	    func(win *proton.Win) { proton.Rect(win, proton.RGB(0x1e1e2e), 0, 120) },
-//	    func(win *proton.Win) {
-//	        proton.Center(win, func(win *proton.Win) { proton.Label(win, "on top") })
+//	    func(win proton.Context) { proton.Rect(win, proton.RGB(0x1e1e2e), 0, 120) },
+//	    func(win proton.Context) {
+//	        proton.Center(win, func(win proton.Context) { proton.Label(win, "on top") })
 //	    },
 //	)
-func ZStack(win *Win, layers ...func(*Win)) {
+func ZStack(win Context, layers ...func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		stacked := make([]layout.StackChild, len(layers))
 		for i, fn := range layers {
@@ -471,11 +471,11 @@ func ZStack(win *Win, layers ...func(*Win)) {
 //	if proton.Button(win, &u.openBtn, "Open") {
 //	    u.modal.Show()
 //	}
-//	proton.Overlay(win, &u.modal, func(win *proton.Win) {
-//	    proton.Card(win, proton.RGB(0x1e1e2e), 12, 24, func(win *proton.Win) {
+//	proton.Overlay(win, &u.modal, func(win proton.Context) {
+//	    proton.Card(win, proton.RGB(0x1e1e2e), 12, 24, func(win proton.Context) {
 //	        proton.H5(win, "Dialog Title")
 //	        proton.Gap(win, 8)
-//	        proton.Pad(win, 4, func(win *proton.Win) {
+//	        proton.Pad(win, 4, func(win proton.Context) {
 //	            if proton.Button(win, &u.closeBtn, "Close") { u.modal.Hide() }
 //	        })
 //	    })
@@ -495,7 +495,7 @@ func (o *OverlayState) Toggle() { o.Visible = !o.Visible }
 
 // Overlay draws a dimmed backdrop with centered content on top of everything.
 // Does nothing when state.Visible is false.
-func Overlay(win *Win, state *OverlayState, content func(*Win)) {
+func Overlay(win Context, state *OverlayState, content func(Context)) {
 	if !state.Visible {
 		return
 	}
@@ -514,9 +514,9 @@ func Overlay(win *Win, state *OverlayState, content func(*Win)) {
 // GrowRow or GrowColumn, pushing siblings to opposite edges.
 //
 //	proton.GrowRow(win,
-//	    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "left") }),
+//	    proton.FixedItem(win, func(win proton.Context) { proton.Label(win, "left") }),
 //	    proton.FlexSpacer(),
-//	    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "right") }),
+//	    proton.FixedItem(win, func(win proton.Context) { proton.Label(win, "right") }),
 //	)
 func FlexSpacer() layout.FlexChild {
 	return layout.Flexed(1, func(gtx layout.Context) layout.Dimensions {
@@ -530,10 +530,10 @@ func FlexSpacer() layout.FlexChild {
 // Saves you from wrapping everything in a Go if block when you just
 // want to show or hide a single widget.
 //
-//	proton.If(win, user.IsAdmin, func(win *proton.Win) {
+//	proton.If(win, user.IsAdmin, func(win proton.Context) {
 //	    proton.Button(win, &u.deleteBtn, "Delete All Users")
 //	})
-func If(win *Win, cond bool, content func(*Win)) {
+func If(win Context, cond bool, content func(Context)) {
 	if !cond {
 		return
 	}
@@ -549,12 +549,12 @@ func If(win *Win, cond bool, content func(*Win)) {
 // Returns true if clicked.
 //
 //	var row proton.Clickable
-//	if proton.HoverCard(win, &row, proton.RGB(0x1e1e2e), proton.RGB(0x2a2a3e), 8, func(win *proton.Win) {
+//	if proton.HoverCard(win, &row, proton.RGB(0x1e1e2e), proton.RGB(0x2a2a3e), 8, func(win proton.Context) {
 //	    proton.Label(win, "hover me")
 //	}) {
 //	    println("clicked")
 //	}
-func HoverCard(win *Win, state *Clickable, bg, hover color.NRGBA, cornerDp float32, content func(*Win)) bool {
+func HoverCard(win Context, state *Clickable, bg, hover color.NRGBA, cornerDp float32, content func(Context)) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)

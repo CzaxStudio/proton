@@ -39,7 +39,7 @@ func (t *ToastState) active() string {
 }
 
 // Toast draws a pill notification. Call last in your draw function.
-func Toast(win *Win, state *ToastState) {
+func Toast(win Context, state *ToastState) {
 	msg := state.active()
 	if msg == "" {
 		return
@@ -51,12 +51,12 @@ func Toast(win *Win, state *ToastState) {
 				w, h := gtx.Constraints.Min.X, gtx.Constraints.Min.Y
 				r := gtx.Dp(unit.Dp(h/2 + 1))
 				rrect := clip.RRect{Rect: image.Rect(0, 0, w, h), NW: r, NE: r, SE: r, SW: r}
-				paint.FillShape(gtx.Ops, win.th.Palette.ContrastBg, rrect.Op(gtx.Ops))
+				paint.FillShape(gtx.Ops, win.theme().Palette.ContrastBg, rrect.Op(gtx.Ops))
 				return layout.Dimensions{Size: image.Pt(w, h)}
 			}),
 			layout.Stacked(func(gtx layout.Context) layout.Dimensions {
-				lbl := material.Body2(win.th, msg)
-				lbl.Color = win.th.Palette.ContrastFg
+				lbl := material.Body2(win.theme(), msg)
+				lbl.Color = win.theme().Palette.ContrastFg
 				return layout.UniformInset(unit.Dp(10)).Layout(gtx, lbl.Layout)
 			}),
 		)

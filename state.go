@@ -24,3 +24,6 @@ type Scrollable = widget.List
 
 // Drag tracks drag gesture state.
 type Drag = widget.Draggable
+
+// Icon holds vector icon data.
+type Icon = widget.Icon

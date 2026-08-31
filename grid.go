@@ -8,11 +8,11 @@ import (
 // Grid arranges widgets in a fixed-column grid.
 //
 //	proton.Grid(win, 3, 8,
-//	    func(win *proton.Win) { proton.Label(win, "one") },
-//	    func(win *proton.Win) { proton.Label(win, "two") },
-//	    func(win *proton.Win) { proton.Label(win, "three") },
+//	    func(win proton.Context) { proton.Label(win, "one") },
+//	    func(win proton.Context) { proton.Label(win, "two") },
+//	    func(win proton.Context) { proton.Label(win, "three") },
 //	)
-func Grid(win *Win, cols int, gapDp float32, cells ...func(*Win)) {
+func Grid(win Context, cols int, gapDp float32, cells ...func(Context)) {
 	if cols <= 0 {
 		cols = 1
 	}
