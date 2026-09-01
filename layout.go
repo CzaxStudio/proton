@@ -6,7 +6,7 @@ import (
 )
 
 // Column stacks widgets vertically.
-func Column(win *Win, widgets ...func(*Win)) {
+func Column(win Context, widgets ...func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		children := make([]layout.FlexChild, len(widgets))
 		for i, fn := range widgets {
@@ -17,7 +17,7 @@ func Column(win *Win, widgets ...func(*Win)) {
 }
 
 // Row places widgets side by side.
-func Row(win *Win, widgets ...func(*Win)) {
+func Row(win Context, widgets ...func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		children := make([]layout.FlexChild, len(widgets))
 		for i, fn := range widgets {
@@ -28,7 +28,7 @@ func Row(win *Win, widgets ...func(*Win)) {
 }
 
 // RowSpread is like Row but puts leftover space between children.
-func RowSpread(win *Win, widgets ...func(*Win)) {
+func RowSpread(win Context, widgets ...func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		children := make([]layout.FlexChild, len(widgets))
 		for i, fn := range widgets {
@@ -39,7 +39,7 @@ func RowSpread(win *Win, widgets ...func(*Win)) {
 }
 
 // RowEnd pushes all children to the right edge.
-func RowEnd(win *Win, widgets ...func(*Win)) {
+func RowEnd(win Context, widgets ...func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		children := make([]layout.FlexChild, len(widgets))
 		for i, fn := range widgets {
@@ -53,35 +53,35 @@ func RowEnd(win *Win, widgets ...func(*Win)) {
 // Use FixedItem for natural-size children, GrowItem for stretchy ones.
 //
 //	proton.GrowRow(win,
-//	    proton.FixedItem(win, func(win *proton.Win) { proton.Label(win, "Name:") }),
-//	    proton.GrowItem(win, func(win *proton.Win) { proton.Input(win, &e, "") }),
-//	    proton.FixedItem(win, func(win *proton.Win) { proton.Button(win, &b, "Go") }),
+//	    proton.FixedItem(win, func(win proton.Context) { proton.Label(win, "Name:") }),
+//	    proton.GrowItem(win, func(win proton.Context) { proton.Input(win, &e, "") }),
+//	    proton.FixedItem(win, func(win proton.Context) { proton.Button(win, &b, "Go") }),
 //	)
-func GrowRow(win *Win, children ...layout.FlexChild) {
+func GrowRow(win Context, children ...layout.FlexChild) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Horizontal}.Layout(gtx, children...)
 	})
 }
 
 // GrowColumn is a vertical column with explicit stretch control.
-func GrowColumn(win *Win, children ...layout.FlexChild) {
+func GrowColumn(win Context, children ...layout.FlexChild) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx, children...)
 	})
 }
 
 // GrowItem makes a child fill remaining space. Use inside GrowRow/GrowColumn.
-func GrowItem(win *Win, fn func(*Win)) layout.FlexChild {
+func GrowItem(win Context, fn func(Context)) layout.FlexChild {
 	return layout.Flexed(1, child(win, fn))
 }
 
 // FixedItem makes a child take only as much space as it needs. Use inside GrowRow/GrowColumn.
-func FixedItem(win *Win, fn func(*Win)) layout.FlexChild {
+func FixedItem(win Context, fn func(Context)) layout.FlexChild {
 	return layout.Rigid(child(win, fn))
 }
 
 // Split gives left and right a fraction of the width. leftFraction is 0.0–1.0.
-func Split(win *Win, leftFraction float32, left, right func(*Win)) {
+func Split(win Context, leftFraction float32, left, right func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Horizontal}.Layout(gtx,
 			layout.Flexed(leftFraction, child(win, left)),
@@ -91,7 +91,7 @@ func Split(win *Win, leftFraction float32, left, right func(*Win)) {
 }
 
 // HSplit splits vertically. topFraction is 0.0–1.0.
-func HSplit(win *Win, topFraction float32, top, bottom func(*Win)) {
+func HSplit(win Context, topFraction float32, top, bottom func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Flex{Axis: layout.Vertical}.Layout(gtx,
 			layout.Flexed(topFraction, child(win, top)),
@@ -101,35 +101,35 @@ func HSplit(win *Win, topFraction float32, top, bottom func(*Win)) {
 }
 
 // Center places a widget in the center of available space.
-func Center(win *Win, fn func(*Win)) {
+func Center(win Context, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Center.Layout(gtx, child(win, fn))
 	})
 }
 
 // Pad adds uniform padding around a widget.
-func Pad(win *Win, dp float32, fn func(*Win)) {
+func Pad(win Context, dp float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.UniformInset(unit.Dp(dp)).Layout(gtx, child(win, fn))
 	})
 }
 
 // PadH adds left+right padding.
-func PadH(win *Win, dp float32, fn func(*Win)) {
+func PadH(win Context, dp float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{Left: unit.Dp(dp), Right: unit.Dp(dp)}.Layout(gtx, child(win, fn))
 	})
 }
 
 // PadV adds top+bottom padding.
-func PadV(win *Win, dp float32, fn func(*Win)) {
+func PadV(win Context, dp float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{Top: unit.Dp(dp), Bottom: unit.Dp(dp)}.Layout(gtx, child(win, fn))
 	})
 }
 
 // PadSides gives per-edge padding control.
-func PadSides(win *Win, top, right, bottom, left float32, fn func(*Win)) {
+func PadSides(win Context, top, right, bottom, left float32, fn func(Context)) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Inset{
 			Top:    unit.Dp(top),
@@ -141,7 +141,7 @@ func PadSides(win *Win, top, right, bottom, left float32, fn func(*Win)) {
 }
 
 // Gap inserts a fixed blank space.
-func Gap(win *Win, dp float32) {
+func Gap(win Context, dp float32) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		return layout.Spacer{Width: unit.Dp(dp), Height: unit.Dp(dp)}.Layout(gtx)
 	})
@@ -149,6 +149,6 @@ func Gap(win *Win, dp float32) {
 
 // Sub returns a layout.Widget that runs fn with a fresh Win.
 // Use when mixing Proton with raw Gio layout code.
-func Sub(win *Win, fn func(*Win)) func(gtx layout.Context) layout.Dimensions {
+func Sub(win Context, fn func(Context)) func(gtx layout.Context) layout.Dimensions {
 	return child(win, fn)
 }

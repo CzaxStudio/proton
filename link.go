@@ -19,12 +19,12 @@ import (
 //	if proton.Link(win, &lnk, "View on GitHub") {
 //	    openBrowser("https://github.com/CzaxStudio/proton")
 //	}
-func Link(win *Win, state *Clickable, text string) bool {
+func Link(win Context, state *Clickable, text string) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)
 
-		c := win.th.Palette.ContrastBg
+		c := win.theme().Palette.ContrastBg
 		if state.Hovered() {
 			c.A = 255
 		} else {
@@ -32,7 +32,7 @@ func Link(win *Win, state *Clickable, text string) bool {
 		}
 
 		return state.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			lbl := material.Body1(win.th, text)
+			lbl := material.Body1(win.theme(), text)
 			lbl.Color = c
 
 			dims := lbl.Layout(gtx)
@@ -53,12 +53,12 @@ func Link(win *Win, state *Clickable, text string) bool {
 }
 
 // LinkSmall is like Link but uses caption-sized text.
-func LinkSmall(win *Win, state *Clickable, text string) bool {
+func LinkSmall(win Context, state *Clickable, text string) bool {
 	result := clickResults[state]
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		clickResults[state] = state.Clicked(gtx)
 
-		c := win.th.Palette.ContrastBg
+		c := win.theme().Palette.ContrastBg
 		if state.Hovered() {
 			c.A = 255
 		} else {
@@ -66,7 +66,7 @@ func LinkSmall(win *Win, state *Clickable, text string) bool {
 		}
 
 		return state.Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-			lbl := material.Caption(win.th, text)
+			lbl := material.Caption(win.theme(), text)
 			lbl.Color = c
 			dims := lbl.Layout(gtx)
 			uh := gtx.Dp(unit.Dp(1))
@@ -86,11 +86,11 @@ func LinkSmall(win *Win, state *Clickable, text string) bool {
 // Good for showing commands, file paths, API keys, config values, etc.
 //
 //	proton.CodeBlock(win, "go get github.com/CzaxStudio/proton")
-func CodeBlock(win *Win, code string) {
+func CodeBlock(win Context, code string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		bg := win.th.Palette.Fg
+		bg := win.theme().Palette.Fg
 		bg.A = 15
-		border := win.th.Palette.Fg
+		border := win.theme().Palette.Fg
 		border.A = 40
 
 		return layout.Stack{}.Layout(gtx,
@@ -109,9 +109,9 @@ func CodeBlock(win *Win, code string) {
 			}),
 			layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 				return layout.UniformInset(unit.Dp(10)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-					lbl := material.Body2(win.th, code)
+					lbl := material.Body2(win.theme(), code)
 					lbl.Font.Typeface = "monospace"
-					accent := win.th.Palette.ContrastBg
+					accent := win.theme().Palette.ContrastBg
 					accent.A = 230
 					lbl.Color = accent
 					return lbl.Layout(gtx)
@@ -125,9 +125,9 @@ func CodeBlock(win *Win, code string) {
 // a full Text() call. Saves a line when you just want one color change.
 //
 //	proton.ColoredText(win, "Warning: this cannot be undone", proton.RGB(0xfbbf24))
-func ColoredText(win *Win, text string, c color.NRGBA) {
+func ColoredText(win Context, text string, c color.NRGBA) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Body1(win.th, text)
+		lbl := material.Body1(win.theme(), text)
 		lbl.Color = c
 		return lbl.Layout(gtx)
 	})
@@ -138,10 +138,10 @@ func ColoredText(win *Win, text string, c color.NRGBA) {
 //
 //	proton.Label(win, "Alice Johnson")
 //	proton.Muted(win, "alice@example.com")
-func Muted(win *Win, text string) {
+func Muted(win Context, text string) {
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Body2(win.th, text)
-		c := win.th.Palette.Fg
+		lbl := material.Body2(win.theme(), text)
+		c := win.theme().Palette.Fg
 		c.A = 140
 		lbl.Color = c
 		return lbl.Layout(gtx)
@@ -152,12 +152,12 @@ func Muted(win *Win, text string) {
 // Pass an empty string to draw nothing (useful for conditional errors).
 //
 //	proton.ErrorText(win, validationErr)
-func ErrorText(win *Win, text string) {
+func ErrorText(win Context, text string) {
 	if text == "" {
 		return
 	}
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Body2(win.th, text)
+		lbl := material.Body2(win.theme(), text)
 		lbl.Color = color.NRGBA{R: 248, G: 113, B: 113, A: 255}
 		return lbl.Layout(gtx)
 	})
@@ -166,24 +166,24 @@ func ErrorText(win *Win, text string) {
 // SuccessText draws text in green. Same empty-string shortcut as ErrorText.
 //
 //	proton.SuccessText(win, "Saved successfully!")
-func SuccessText(win *Win, text string) {
+func SuccessText(win Context, text string) {
 	if text == "" {
 		return
 	}
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Body2(win.th, text)
+		lbl := material.Body2(win.theme(), text)
 		lbl.Color = color.NRGBA{R: 74, G: 222, B: 128, A: 255}
 		return lbl.Layout(gtx)
 	})
 }
 
 // WarningText draws text in yellow/amber.
-func WarningText(win *Win, text string) {
+func WarningText(win Context, text string) {
 	if text == "" {
 		return
 	}
 	win.add(func(gtx layout.Context) layout.Dimensions {
-		lbl := material.Body2(win.th, text)
+		lbl := material.Body2(win.theme(), text)
 		lbl.Color = color.NRGBA{R: 251, G: 191, B: 36, A: 255}
 		return lbl.Layout(gtx)
 	})

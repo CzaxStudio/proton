@@ -274,30 +274,30 @@ type ThemePickerState struct {
 // Place it in a settings panel or a dedicated theme window.
 //
 //	proton.ThemePicker(win, &u.picker, a)
-func ThemePicker(win *Win, state *ThemePickerState, a *App) {
+func ThemePicker(win Context, state *ThemePickerState, a *App) {
 	for len(state.btns) < len(AllPalettes) {
 		state.btns = append(state.btns, Clickable{})
 	}
 
-	List(win, &state.scroll, len(AllPalettes), func(win *Win, i int) {
+	List(win, &state.scroll, len(AllPalettes), func(win Context, i int) {
 		p := AllPalettes[i]
-		if Tappable(win, &state.btns[i], func(win *Win) {
-			PadV(win, 6, func(win *Win) {
+		if Tappable(win, &state.btns[i], func(win Context) {
+			PadV(win, 6, func(win Context) {
 				Row(win,
-					func(win *Win) {
+					func(win Context) {
 						// four color swatches
 						Row(win,
-							func(win *Win) { Rect(win, p.Palette.Bg, 14, 14) },
-							func(win *Win) { Gap(win, 2) },
-							func(win *Win) { Rect(win, p.Palette.Fg, 14, 14) },
-							func(win *Win) { Gap(win, 2) },
-							func(win *Win) { Rect(win, p.Palette.Primary, 14, 14) },
-							func(win *Win) { Gap(win, 2) },
-							func(win *Win) { Rect(win, p.Palette.PrimaryFg, 14, 14) },
+							func(win Context) { Rect(win, p.Palette.Bg, 14, 14) },
+							func(win Context) { Gap(win, 2) },
+							func(win Context) { Rect(win, p.Palette.Fg, 14, 14) },
+							func(win Context) { Gap(win, 2) },
+							func(win Context) { Rect(win, p.Palette.Primary, 14, 14) },
+							func(win Context) { Gap(win, 2) },
+							func(win Context) { Rect(win, p.Palette.PrimaryFg, 14, 14) },
 						)
 					},
-					func(win *Win) { Gap(win, 10) },
-					func(win *Win) {
+					func(win Context) { Gap(win, 10) },
+					func(win Context) {
 						label := p.Name
 						if i == state.selected {
 							label = "• " + label

@@ -21,9 +21,10 @@ import (
 //	    menuTag  proton.FrameTag
 //	}
 type ContextMenuState struct {
-	Open bool
-	x, y int
-	btns []widget.Clickable
+	Open     bool
+	selected int
+	x, y     int
+	btns     []widget.Clickable
 }
 
 // ContextMenuItem is one entry in a context menu.
@@ -42,18 +43,19 @@ type ContextMenuItem struct {
 //	    {Label: "Delete", Disabled: false},
 //	}
 //
-//	i := proton.ContextMenu(win, &u.menu, &u.menuTag, items, func(win *proton.Win) {
+//	i := proton.ContextMenu(win, &u.menu, &u.menuTag, items, func(win proton.Context) {
 //	    proton.Label(win, "right-click me")
 //	})
 //	if i >= 0 {
 //	    fmt.Println("selected:", items[i].Label)
 //	}
-func ContextMenu(win *Win, state *ContextMenuState, tag *FrameTag, items []ContextMenuItem, content func(*Win)) int {
+func ContextMenu(win Context, state *ContextMenuState, tag *FrameTag, items []ContextMenuItem, content func(Context)) int {
 	for len(state.btns) < len(items) {
 		state.btns = append(state.btns, widget.Clickable{})
 	}
 
-	selected := -1
+	selected := state.selected
+	state.selected = -1
 
 	win.add(func(gtx layout.Context) layout.Dimensions {
 		// register for pointer events on the content area
@@ -82,7 +84,7 @@ func ContextMenu(win *Win, state *ContextMenuState, tag *FrameTag, items []Conte
 		// check menu item clicks
 		for i := range items {
 			if !items[i].Disabled && state.btns[i].Clicked(gtx) {
-				selected = i
+				state.selected = i
 				state.Open = false
 			}
 		}
@@ -111,11 +113,11 @@ func ContextMenu(win *Win, state *ContextMenuState, tag *FrameTag, items []Conte
 
 		macro := op.Record(gtx.Ops)
 
-		bg := win.th.Palette.Bg
+		bg := win.theme().Palette.Bg
 		bg.R += 20
 		bg.G += 20
 		bg.B += 20
-		shadow := win.th.Palette.Fg
+		shadow := win.theme().Palette.Fg
 		shadow.A = 40
 
 		r := gtx.Dp(unit.Dp(5))
@@ -141,7 +143,7 @@ func ContextMenu(win *Win, state *ContextMenuState, tag *FrameTag, items []Conte
 				return state.btns[i].Layout(gtx, func(gtx layout.Context) layout.Dimensions {
 					rowBg := bg
 					if !items[i].Disabled && state.btns[i].Hovered() {
-						rowBg = win.th.Palette.ContrastBg
+						rowBg = win.theme().Palette.ContrastBg
 						rowBg.A = 60
 					}
 					return layout.Stack{}.Layout(gtx,
@@ -153,7 +155,7 @@ func ContextMenu(win *Win, state *ContextMenuState, tag *FrameTag, items []Conte
 						}),
 						layout.Stacked(func(gtx layout.Context) layout.Dimensions {
 							return layout.UniformInset(unit.Dp(8)).Layout(gtx, func(gtx layout.Context) layout.Dimensions {
-								lbl := material.Body2(win.th, items[i].Label)
+								lbl := material.Body2(win.theme(), items[i].Label)
 								if items[i].Disabled {
 									lbl.Color.A = 90
 								}
