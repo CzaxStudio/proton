@@ -32,7 +32,9 @@ Thank you to the early adopters who supported Proton from the very beginning!
   </tr>
 </table>
 
+### Thanks Contributor!
 
+<td align="center"><a href="https://github.com/diamondosas"><img src="https://github.com/diamondosas.png?size=100" width="100px;" alt=""/><br /><sub><b>@diamondosas</b></sub></a></td>
 
 ## Documentation
 
