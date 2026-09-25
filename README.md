@@ -8,7 +8,7 @@ A GUI library for Go that doesn't make you want to switch to web dev.
 We are open to accepting new contributors! If you would like to join the project, please open a pull request. We will review your GitHub profile and projects before making a decision
 
 ## ISSUES
-Found an issue? Tell us at [issues](https://github.com/CzaxStudio/proton/issues), and we'll fix it
+Found an issue? Report it on [GitHub](https://github.com/CzaxStudio/proton/issues) and we'll fix it.
 
 ## Why Proton?
 **Zero CGO Required: Cross-compile to Windows and macOS flawlessly from any machine without fighting external compiler toolchains.**
